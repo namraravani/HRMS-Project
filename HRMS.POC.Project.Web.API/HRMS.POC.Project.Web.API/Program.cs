@@ -1,4 +1,7 @@
+using HRMS.POC.Project.Web.API.Controllers;
 using HRMS.POC.Project.Web.API.Models;
+using HRMS.POC.Project.Web.API.Repository;
+using HRMS_POC_Project.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<HrmsDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("DatabaseConfig"));
 
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<HrmsDbContext>().AddDefaultTokenProviders();
-
+//builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("DatabaseConfig"));
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -8,11 +8,15 @@ namespace HRMS.POC.Project.Web.API.Models
 
         [Required(ErrorMessage = "Organization Name is Required")]
         
-        public string OrgName { get; set; }
+        public string orgName { get; set; }
 
 
         [Required(ErrorMessage = "Organization Address is Required")]
-        public string? Address { get; set; }
+        public string? address { get; set; }
+
+        public virtual ICollection<OrganizationUser> OrganizationUsers { get; set; }
+
+
 
     }
 }

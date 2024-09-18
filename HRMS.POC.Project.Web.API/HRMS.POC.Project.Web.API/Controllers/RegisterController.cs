@@ -33,7 +33,6 @@ namespace HRMS.POC.Project.Web.API.Controllers
         }
 
         [HttpPost]
-
         public async Task<IActionResult> Register([FromBody] RegisterUser registerUser, string? role)
         {
         
@@ -45,7 +44,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
                     Email = registerUser.Email,
                     SecurityStamp = Guid.NewGuid().ToString(),
                     UserName = registerUser.Username,
-                    Created_by = null
+                    Created_by = null,
 
                 };
                 var result = await _userManager.CreateAsync(user, registerUser.Password);
@@ -60,7 +59,6 @@ namespace HRMS.POC.Project.Web.API.Controllers
 
                     
                     await _userManager.UpdateAsync(user);
-
                     
                     if (string.IsNullOrEmpty(role))
                     {

@@ -13,7 +13,6 @@ namespace HRMS.POC.Project.Web.API.Controllers
         [HttpPost]
         public List<string> CreateUser([FromBody] RegisterUser registerUser)
         {
-
             return ["Namra", "parthiv", "Abhi"];
         }
     }
