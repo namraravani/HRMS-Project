@@ -35,55 +35,33 @@ namespace HRMS.POC.Project.Web.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterUser registerUser, string? role)
         {
-        
-            var usersCount = await _dbContext.Users.CountAsync();
-            if (usersCount == 0)
-            {
-                ApplicationUser user = new()
-                {
-                    Email = registerUser.Email,
-                    SecurityStamp = Guid.NewGuid().ToString(),
-                    UserName = registerUser.Username,
-                    Created_by = null,
-
-                };
-                var result = await _userManager.CreateAsync(user, registerUser.Password);
-
-                if (result.Succeeded)
-                {
-
-                    var userId = user.Id;
-
-                    
-                    user.Created_by = userId;
-
-                    
-                    await _userManager.UpdateAsync(user);
-                    
-                    if (string.IsNullOrEmpty(role))
-                    {
-                        await _userManager.AddToRoleAsync(user, "Admin");
-                    }
-
-                    return Ok(new { Message = "User registered successfully!" });
-                }
-            }
-            
-            
-            ApplicationUser user1 = new()
+            var user1 = new ApplicationUser
             {
                 Email = registerUser.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = registerUser.Username,
                 Created_by = null,
-
+                Is_Delete = false 
             };
+
             var result1 = await _userManager.CreateAsync(user1, registerUser.Password);
-            await _userManager.AddToRoleAsync(user1,"Employee");
+            if (result1.Succeeded)
+            {
+                if (!string.IsNullOrEmpty(role))
+                {
+                    await _userManager.AddToRoleAsync(user1, role);
+                }
+                else
+                {
+                    await _userManager.AddToRoleAsync(user1, "Employee"); // Default role if none provided
+                }
 
+                return Ok(new { Message = "Employee registered successfully!" });
+            }
 
-            return Ok(new { Message = "Employee registered successfully!" });
+            return BadRequest(result1.Errors);
         }
+
 
         [HttpPost]
         [Route("[action]")]

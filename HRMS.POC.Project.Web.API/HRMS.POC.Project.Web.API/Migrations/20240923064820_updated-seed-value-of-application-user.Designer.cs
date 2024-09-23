@@ -4,6 +4,7 @@ using HRMS.POC.Project.Web.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS.POC.Project.Web.API.Migrations
 {
     [DbContext(typeof(HrmsDbContext))]
-    partial class HrmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240923064820_updated-seed-value-of-application-user")]
+    partial class updatedseedvalueofapplicationuser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,105 +25,7 @@ namespace HRMS.POC.Project.Web.API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("HRMS.POC.Project.Web.API.Models.Organization", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("orgName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Organizations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "9a2a9e69-0096-41d7-b117-212e20dbfe36",
-                            address = "Gandhinagar",
-                            orgName = "Evision"
-                        });
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "be96181c-bace-451c-8fe7-e51640978123",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "50489e6e-7fad-42ac-8e3f-02c4d3eed296",
-                            Name = "HR",
-                            NormalizedName = "HR"
-                        },
-                        new
-                        {
-                            Id = "e2111fea-3848-4670-944c-57a7b37e114a",
-                            Name = "Employee",
-                            NormalizedName = "EMPLOYEE"
-                        });
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+            modelBuilder.Entity("ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -132,16 +37,18 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
+                    b.Property<string>("Created_by")
                         .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Is_Delete")
                         .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
@@ -189,9 +96,122 @@ namespace HRMS.POC.Project.Web.API.Migrations
 
                     b.ToTable("AspNetUsers", (string)null);
 
-                    b.HasDiscriminator().HasValue("IdentityUser");
+                    b.HasData(
+                        new
+                        {
+                            Id = "bf72dd7c-665c-4c06-bd94-ad2e044e1ca6",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "6a435438-7f5c-4358-bd94-de42a8372bf4",
+                            Created_by = "bf72dd7c-665c-4c06-bd94-ad2e044e1ca6",
+                            Email = "namraravani8@gmail.com",
+                            EmailConfirmed = false,
+                            Is_Delete = true,
+                            LockoutEnabled = false,
+                            PasswordHash = "449ED546C921FE530F94E99FBF7EF1C437E5B066940AB606C345576C0457332A",
+                            PhoneNumber = "9427662325",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "43735e77-e5de-411e-b0c7-8d600bfad5ec",
+                            TwoFactorEnabled = false,
+                            UserName = "Namra"
+                        });
+                });
 
-                    b.UseTphMappingStrategy();
+            modelBuilder.Entity("HRMS.POC.Project.Web.API.Models.Organization", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("orgName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Organizations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "d70c21e8-5ce0-475a-9a01-9cfe417174d3",
+                            address = "Gandhinagar",
+                            orgName = "Evision"
+                        });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex")
+                        .HasFilter("[NormalizedName] IS NOT NULL");
+
+                    b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "81cebf58-ac38-4615-8a3b-fe08eb20cc04",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "71907976-3054-462f-aa63-30c9bda8af1f",
+                            Name = "HR",
+                            NormalizedName = "HR"
+                        },
+                        new
+                        {
+                            Id = "bfffce75-6477-4322-b269-dc88e18522ea",
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -258,8 +278,8 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "41cd4958-fc67-476d-8788-ecbde93b1d77",
-                            RoleId = "be96181c-bace-451c-8fe7-e51640978123"
+                            UserId = "bf72dd7c-665c-4c06-bd94-ad2e044e1ca6",
+                            RoleId = "81cebf58-ac38-4615-8a3b-fe08eb20cc04"
                         });
                 });
 
@@ -299,51 +319,8 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasData(
                         new
                         {
-                            OrganizationId = "9a2a9e69-0096-41d7-b117-212e20dbfe36",
-                            UserId = "41cd4958-fc67-476d-8788-ecbde93b1d77"
-                        });
-                });
-
-            modelBuilder.Entity("ApplicationUser", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.Property<string>("Created_by")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Is_Delete")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("firstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("lastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasDiscriminator().HasValue("ApplicationUser");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "41cd4958-fc67-476d-8788-ecbde93b1d77",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "8e9a9fad-4c92-466b-953e-01f521a158e3",
-                            Email = "namraravani8@gmail.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "449ED546C921FE530F94E99FBF7EF1C437E5B066940AB606C345576C0457332A",
-                            PhoneNumber = "9427662325",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "d1a37d73-9a49-4cbe-8c03-05232b1187f9",
-                            TwoFactorEnabled = false,
-                            UserName = "Namra",
-                            Created_by = "41cd4958-fc67-476d-8788-ecbde93b1d77",
-                            Is_Delete = false,
-                            firstName = "Namra",
-                            lastName = "Ravani"
+                            OrganizationId = "d70c21e8-5ce0-475a-9a01-9cfe417174d3",
+                            UserId = "bf72dd7c-665c-4c06-bd94-ad2e044e1ca6"
                         });
                 });
 
@@ -358,7 +335,7 @@ namespace HRMS.POC.Project.Web.API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -367,7 +344,7 @@ namespace HRMS.POC.Project.Web.API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -382,7 +359,7 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -391,7 +368,7 @@ namespace HRMS.POC.Project.Web.API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -417,12 +394,12 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("HRMS.POC.Project.Web.API.Models.Organization", b =>
+            modelBuilder.Entity("ApplicationUser", b =>
                 {
                     b.Navigation("OrganizationUsers");
                 });
 
-            modelBuilder.Entity("ApplicationUser", b =>
+            modelBuilder.Entity("HRMS.POC.Project.Web.API.Models.Organization", b =>
                 {
                     b.Navigation("OrganizationUsers");
                 });

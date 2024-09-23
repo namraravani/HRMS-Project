@@ -56,7 +56,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
 
         // PUT: api/Organization/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrganization(Guid id, Organization organization)
+        public async Task<IActionResult> UpdateOrganization(string id, Organization organization)
         {
             if (id != organization.Id)
             {
@@ -65,11 +65,11 @@ namespace HRMS.POC.Project.Web.API.Controllers
 
             await _organizationRepository.UpdateOrganizations(organization);
 
-            
             return Ok(organization);
         }
 
-        
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganization(Guid id)
         {
@@ -85,9 +85,10 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return Ok();
         }
 
-        private bool OrganizationExists(Guid id)
+        private bool OrganizationExists(string id)
         {
             return _context.Organizations.Any(e => e.Id == id);
         }
+
     }
 }

@@ -20,6 +20,7 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<HrmsDbContext>().AddDefaultTokenProviders();
 //builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("DatabaseConfig"));
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IUserRepository,UserRepository>();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

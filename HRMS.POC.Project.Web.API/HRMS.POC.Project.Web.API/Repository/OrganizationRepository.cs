@@ -49,7 +49,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public async Task<Organization> AddOrganizationAsync(Organization organization)
         {
-            organization.Id = Guid.NewGuid();
+            organization.Id = Guid.NewGuid().ToString();
             var sql = @"INSERT INTO Organizations(Id,orgName,address) values(@Id,@orgName,@address)";
             using (var connection = CreateConnection())
             {

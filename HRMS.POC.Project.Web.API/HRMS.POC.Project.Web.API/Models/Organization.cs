@@ -4,7 +4,7 @@ namespace HRMS.POC.Project.Web.API.Models
 {
     public class Organization
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         [Required(ErrorMessage = "Organization Name is Required")]
         

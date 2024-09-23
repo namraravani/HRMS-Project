@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS.POC.Project.Web.API.Migrations
 {
     [DbContext(typeof(HrmsDbContext))]
-    [Migration("20240916094003_Updated-IsDeleteDeafultValue")]
-    partial class UpdatedIsDeleteDeafultValue
+    [Migration("20240923095620_added-some-fields-in-application-user")]
+    partial class addedsomefieldsinapplicationuser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,21 +27,28 @@ namespace HRMS.POC.Project.Web.API.Migrations
 
             modelBuilder.Entity("HRMS.POC.Project.Web.API.Models.Organization", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Address")
+                    b.Property<string>("address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OrgName")
+                    b.Property<string>("orgName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Organizations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "9a2a9e69-0096-41d7-b117-212e20dbfe36",
+                            address = "Gandhinagar",
+                            orgName = "Evision"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -69,6 +76,26 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "be96181c-bace-451c-8fe7-e51640978123",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "50489e6e-7fad-42ac-8e3f-02c4d3eed296",
+                            Name = "HR",
+                            NormalizedName = "HR"
+                        },
+                        new
+                        {
+                            Id = "e2111fea-3848-4670-944c-57a7b37e114a",
+                            Name = "Employee",
+                            NormalizedName = "EMPLOYEE"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -230,6 +257,13 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "41cd4958-fc67-476d-8788-ecbde93b1d77",
+                            RoleId = "be96181c-bace-451c-8fe7-e51640978123"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -251,21 +285,69 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("OrganizationUser", b =>
+                {
+                    b.Property<string>("OrganizationId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("OrganizationId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("OrganizationUsers");
+
+                    b.HasData(
+                        new
+                        {
+                            OrganizationId = "9a2a9e69-0096-41d7-b117-212e20dbfe36",
+                            UserId = "41cd4958-fc67-476d-8788-ecbde93b1d77"
+                        });
+                });
+
             modelBuilder.Entity("ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.Property<string>("Created_by")
                         .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Is_Delete")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
+
+                    b.Property<string>("firstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("lastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "41cd4958-fc67-476d-8788-ecbde93b1d77",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "8e9a9fad-4c92-466b-953e-01f521a158e3",
+                            Email = "namraravani8@gmail.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            PasswordHash = "449ED546C921FE530F94E99FBF7EF1C437E5B066940AB606C345576C0457332A",
+                            PhoneNumber = "9427662325",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "d1a37d73-9a49-4cbe-8c03-05232b1187f9",
+                            TwoFactorEnabled = false,
+                            UserName = "Namra",
+                            Created_by = "41cd4958-fc67-476d-8788-ecbde93b1d77",
+                            Is_Delete = false,
+                            firstName = "Namra",
+                            lastName = "Ravani"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -317,6 +399,35 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("OrganizationUser", b =>
+                {
+                    b.HasOne("HRMS.POC.Project.Web.API.Models.Organization", "Organization")
+                        .WithMany("OrganizationUsers")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ApplicationUser", "User")
+                        .WithMany("OrganizationUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HRMS.POC.Project.Web.API.Models.Organization", b =>
+                {
+                    b.Navigation("OrganizationUsers");
+                });
+
+            modelBuilder.Entity("ApplicationUser", b =>
+                {
+                    b.Navigation("OrganizationUsers");
                 });
 #pragma warning restore 612, 618
         }
