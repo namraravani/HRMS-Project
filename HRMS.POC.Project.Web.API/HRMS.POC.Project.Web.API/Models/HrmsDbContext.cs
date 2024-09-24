@@ -6,7 +6,7 @@ using System.Text;
 
 namespace HRMS.POC.Project.Web.API.Models
 {
-    public class HrmsDbContext : IdentityDbContext<IdentityUser,IdentityRole, string>
+    public class HrmsDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
         public HrmsDbContext(DbContextOptions<HrmsDbContext> options) : base(options) { }
 

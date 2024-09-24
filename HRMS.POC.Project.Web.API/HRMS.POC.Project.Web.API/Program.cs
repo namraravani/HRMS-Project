@@ -1,6 +1,7 @@
 using HRMS.POC.Project.Web.API.Controllers;
 using HRMS.POC.Project.Web.API.Models;
 using HRMS.POC.Project.Web.API.Repository;
+using HRMS.POC.Project.Web.API.Services;
 using HRMS_POC_Project.Model;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -12,24 +13,40 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddDbContext<HrmsDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Configure database settings
 builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("DatabaseConfig"));
+builder.Services.AddDbContext<HrmsDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<HrmsDbContext>().AddDefaultTokenProviders();
-//builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("DatabaseConfig"));
+// Configure Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<HrmsDbContext>()
+    .AddDefaultTokenProviders();
+
+// Register repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
-builder.Services.AddScoped<IUserRepository,UserRepository>();
+
+// Register services
+builder.Services.AddScoped<IOrganizationService, OrganizationService>(); // Add this line
+builder.Services.AddScoped<IUserService, UserService>(provider =>
+{   
+    var userRepository = provider.GetRequiredService<IUserRepository>();
+    var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
+    var jwtSecret = builder.Configuration["JWT:Secret"];
+    var organizationService = provider.GetRequiredService<IOrganizationService>();
+    return new UserService(userRepository, userManager, jwtSecret, organizationService);
+});
+
+// Configure JWT authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options => {
-    options.SaveToken = true;
-    options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters()
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -39,8 +56,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Add controllers and Swagger
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
@@ -59,23 +76,20 @@ builder.Services.AddSwaggerGen(option =>
         {
             new OpenApiSecurityScheme
             {
-                Reference=  new OpenApiReference
+                Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id  = "Bearer"
+                    Id = "Bearer"
                 }
-
             },
-        new string[]{}
+            new string[] {}
         }
     });
 });
 
+// Build and run the application
 var app = builder.Build();
 
-
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -83,10 +97,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

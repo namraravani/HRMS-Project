@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HRMS.POC.Project.Web.API.Repository;
+using HRMS.POC.Project.Web.API.Models.DTO;
 
 namespace HRMS.POC.Project.Web.API.Controllers
 {
@@ -45,14 +46,15 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return Ok(result);
         }
 
-        
+
         [HttpPost]
-        public async Task<ActionResult<Organization>> CreateOrganization(Organization organization)
+        public async Task<ActionResult<OrganizationDTO>> CreateOrganization(OrganizationDTO organization)
         {
-            await _organizationRepository.AddOrganizationAsync(organization);
-          
-            return CreatedAtAction(nameof(GetOrganization), new { id = organization.Id }, organization);
+            var createdOrganization = await _organizationRepository.AddOrganizationAsync(organization);
+
+            return CreatedAtAction(nameof(GetOrganization), new { id = createdOrganization.Id }, createdOrganization);
         }
+
 
         // PUT: api/Organization/5
         [HttpPut("{id}")]
