@@ -5,7 +5,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 {
     public interface IOrganizationRepository
     {
-        Task<IEnumerable<Organization>> GetOrganizationsAsync();
+        public Task<IEnumerable<Organization>> GetUserOrganizationsAsync(string userId, string role);
 
         Task<Organization> GetOrganizationByIdAsync(Guid id);
 
@@ -21,7 +21,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         Task<Organization> FindOrganizationAsync();
 
-        Task<string> GetOrganizationNameByUserIdAsync(string userId);
+        Task<string> GetOrganizationIdByUserIdAsync(string userId);
 
 
 

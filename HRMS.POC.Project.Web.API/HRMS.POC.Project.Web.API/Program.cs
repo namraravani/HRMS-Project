@@ -35,7 +35,8 @@ builder.Services.AddScoped<IUserService, UserService>(provider =>
     var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
     var jwtSecret = builder.Configuration["JWT:Secret"];
     var organizationService = provider.GetRequiredService<IOrganizationService>();
-    return new UserService(userRepository, userManager, jwtSecret, organizationService);
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    return new UserService(userRepository, userManager, jwtSecret, organizationService,configuration);
 });
 
 // Configure JWT authentication

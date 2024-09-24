@@ -12,6 +12,13 @@ namespace HRMS.POC.Project.Web.API.Services
 
             _organizationRepository = organizationRepository;
         }
+
+        public async Task<IEnumerable<Organization>> GetOrganizationAsync(string userId, string role) { 
+
+            var result = await _organizationRepository.GetUserOrganizationsAsync(userId, role);
+
+            return result;
+        }
         public async Task<(bool Success, string Message)> AddOrgUserAsync(ApplicationUser user)
         {
             var orgExist = await _organizationRepository.FindOrganizationAsync();
@@ -20,7 +27,7 @@ namespace HRMS.POC.Project.Web.API.Services
                 return (false, "Organization does not exist.");
             }
 
-            // Add the user to the organization
+            
             var result = await _organizationRepository.AddUserToOrganization(orgExist.Id, user);
 
             if (result)
@@ -31,9 +38,9 @@ namespace HRMS.POC.Project.Web.API.Services
             return (false, "Failed to add user to organization.");
         }
 
-        public async Task<string> GetOrganizationNameByUserIdAsync(string userId)
+        public async Task<string> GetOrganizationIdByUserIdAsync(string userId)
         {
-            return await _organizationRepository.GetOrganizationNameByUserIdAsync(userId);
+            return await _organizationRepository.GetOrganizationIdByUserIdAsync(userId);
         }
 
 

@@ -18,13 +18,15 @@ public class UserService : IUserService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly string _jwtSecret;
     private readonly IOrganizationService _organizationService;
+    private readonly IConfiguration _configuration;
 
-    public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager, string jwtSecret,IOrganizationService organizationService)
+    public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager, string jwtSecret,IOrganizationService organizationService,IConfiguration configuration)
     {
         _userRepository = userRepository;
         _userManager = userManager;
         _jwtSecret = jwtSecret;
         _organizationService = organizationService;
+        _configuration = configuration;
     }
 
     public async Task<string> Register(RegisterUser registerUser)
@@ -70,6 +72,8 @@ public class UserService : IUserService
 
 
 
+
+
     public async Task<string> Login(LoginUser userDto)
     {
         var user = await _userManager.FindByNameAsync(userDto.Username);
@@ -80,7 +84,7 @@ public class UserService : IUserService
 
         
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-        var organizationName = await _organizationService.GetOrganizationNameByUserIdAsync(user.Id); 
+        var organizationId = await _organizationService.GetOrganizationIdByUserIdAsync(user.Id); 
 
        
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -92,10 +96,13 @@ public class UserService : IUserService
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Role, role),
-            new Claim("OrganizationName", organizationName)
+            new Claim("OrganizationId", organizationId),
+            new Claim("UserId",user.Id)
         }),
             Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+            Audience = _configuration["JWT:ValidAudience"],
+            Issuer = _configuration["JWT:ValidIssuer"]
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);

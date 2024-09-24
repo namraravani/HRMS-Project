@@ -78,17 +78,17 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public async Task<string> AddUser(ApplicationUser user, string password, UserManager<ApplicationUser> userManager)
         {
-            // Create the user and hash the password
+            
             var result = await userManager.CreateAsync(user, password);
 
-            // Check if user creation succeeded
+            
             if (!result.Succeeded)
             {
-                // Handle the failure (you might want to throw an exception or return a specific error)
-                return null; // Indicate failure
+                
+                return null;
             }
 
-            return user.Id; // Return the new user's Id
+            return user.Id; 
         }
 
 

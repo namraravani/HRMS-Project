@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HRMS.POC.Project.Web.API.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HRMS.POC.Project.Web.API.Services
 {
@@ -6,6 +7,8 @@ namespace HRMS.POC.Project.Web.API.Services
     {
         public Task<(bool Success, string Message)> AddOrgUserAsync(ApplicationUser user);
 
-        public Task<string> GetOrganizationNameByUserIdAsync(string userId);
+        public Task<string> GetOrganizationIdByUserIdAsync(string userId);
+
+        public Task<IEnumerable<Organization>> GetOrganizationAsync(string userId, string role);
     }
 }

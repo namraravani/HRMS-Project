@@ -24,14 +24,17 @@ namespace HRMS.POC.Project.Web.API.Repository
             return new SqlConnection(_connectionString);
         }
 
-        public async Task<IEnumerable<Organization>> GetOrganizationsAsync()
+
+        public async Task<IEnumerable<Organization>> GetUserOrganizationsAsync(string userId, string role)
         {
-            const string sql = "SELECT * FROM Organizations";
+            var sql = "GetUserOrganizations"; 
             using (var connection = CreateConnection())
             {
-                return await connection.QueryAsync<Organization>(sql);
+                return await connection.QueryAsync<Organization>(sql, new { UserId = userId, Role = role }, commandType: CommandType.StoredProcedure);
             }
         }
+
+
 
         public async Task<Organization> GetOrganizationByIdAsync(Guid id)
         {
@@ -140,8 +143,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 
                 return id;
             }
-
-            
+  
         }
 
         public async Task<bool> AddUserToOrganization(string organizationId, ApplicationUser user)
@@ -171,10 +173,15 @@ namespace HRMS.POC.Project.Web.API.Repository
             }
         }
 
-        public async Task<string> GetOrganizationNameByUserIdAsync(string userId)
+        public async Task<string> GetOrganizationIdByUserIdAsync(string userId)
         {
-            var sql = "SELECT OrganizationName FROM Organizations WHERE UserId = @UserId";
-            return await _dbConnection.ExecuteScalarAsync<string>(sql, new { UserId = userId });
+            var sql = "SELECT OrganizationId FROM OrganizationUsers WHERE UserId = @UserId";
+
+            using (var conn = CreateConnection())
+            {
+                return await conn.ExecuteScalarAsync<string>(sql, new { UserId = userId });
+            }
+           
         }
 
 

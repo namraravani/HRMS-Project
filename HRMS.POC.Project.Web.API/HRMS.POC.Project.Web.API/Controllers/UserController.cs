@@ -11,7 +11,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : BaseController
     {
         private readonly IUserRepository _userRepository;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -27,7 +27,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         }
 
 
-
+        
         [HttpGet]
         public async Task<IEnumerable<ApplicationUser>> GetUsers()
         {
@@ -47,66 +47,66 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return Ok(user);
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> UserCreateAsync([FromBody] RegisterUser registerUser, string role)
-        {
-            if (registerUser == null || string.IsNullOrEmpty(registerUser.Username) || string.IsNullOrEmpty(registerUser.Password))
-            {
-                return BadRequest("Invalid user data.");
-            }
+        //[HttpPost("create")]
+        //public async Task<IActionResult> UserCreateAsync([FromBody] RegisterUser registerUser, string role)
+        //{
+        //    if (registerUser == null || string.IsNullOrEmpty(registerUser.Username) || string.IsNullOrEmpty(registerUser.Password))
+        //    {
+        //        return BadRequest("Invalid user data.");
+        //    }
 
-            var user = new ApplicationUser
-            {
-                Email = registerUser.Email,
-                UserName = registerUser.Username,
-                SecurityStamp = Guid.NewGuid().ToString(),
-                Created_by = GlobalConstants.CreatedBy, 
-                firstName = registerUser.firstName, 
-                lastName = registerUser.lastName
-            };
+        //    var user = new ApplicationUser
+        //    {
+        //        Email = registerUser.Email,
+        //        UserName = registerUser.Username,
+        //        SecurityStamp = Guid.NewGuid().ToString(),
+        //        Created_by = GlobalConstants.CreatedBy, 
+        //        firstName = registerUser.firstName, 
+        //        lastName = registerUser.lastName
+        //    };
                 
-            if (await _roleManager.RoleExistsAsync(role))
-            {
-                var result = await _userManager.CreateAsync(user, registerUser.Password);
-                if (!result.Succeeded)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User Failed To Create" });
-                }
-                await _userManager.AddToRoleAsync(user, role);
-                return Ok(new { Message = "User created successfully!" });
-            }
+        //    if (await _roleManager.RoleExistsAsync(role))
+        //    {
+        //        var result = await _userManager.CreateAsync(user, registerUser.Password);
+        //        if (!result.Succeeded)
+        //        {
+        //            return StatusCode(StatusCodes.Status500InternalServerError, new { Status = "Error", Message = "User Failed To Create" });
+        //        }
+        //        await _userManager.AddToRoleAsync(user, role);
+        //        return Ok(new { Message = "User created successfully!" });
+        //    }
 
-            return BadRequest("Role does not exist.");
-        }
+        //    return BadRequest("Role does not exist.");
+        //}
 
-        // PUT: api/user/update/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userDto)
-        {
-            if (userDto == null)
-            {
-                return BadRequest("Invalid user data.");
-            }
+        //// PUT: api/user/update/{id}
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userDto)
+        //{
+        //    if (userDto == null)
+        //    {
+        //        return BadRequest("Invalid user data.");
+        //    }
 
-            var existingUser = await _userRepository.GetUserByIdAsync(id);
-            if (existingUser == null)
-            {
-                return NotFound();
-            }
+        //    var existingUser = await _userRepository.GetUserByIdAsync(id);
+        //    if (existingUser == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            // Only update the fields that are provided in the DTO
-            existingUser.UserName = userDto.UserName ?? existingUser.UserName;
-            existingUser.firstName = userDto.FirstName ?? existingUser.firstName;
-            existingUser.lastName = userDto.LastName ?? existingUser.lastName;
+        //    // Only update the fields that are provided in the DTO
+        //    existingUser.UserName = userDto.UserName ?? existingUser.UserName;
+        //    existingUser.firstName = userDto.FirstName ?? existingUser.firstName;
+        //    existingUser.lastName = userDto.LastName ?? existingUser.lastName;
 
-            var updatedUser = await _userRepository.UpdateUserAsync(existingUser);
-            if (updatedUser == null)
-            {
-                return NotFound();
-            }
+        //    var updatedUser = await _userRepository.UpdateUserAsync(existingUser);
+        //    if (updatedUser == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(updatedUser);
-        }
+        //    return Ok(updatedUser);
+        //}
 
 
 
