@@ -42,19 +42,19 @@ namespace HRMS.POC.Project.Web.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddUser(UserDTO user, string assignedRole)
         {
-            
+
             var result = await _userService.ValidateUserForAdd(UserRole, user, UserId, OrganizationId, assignedRole);
 
-            if(result == "Unauthorized")
-            {
-                return BadRequest(result);  
-            }
-            else if(result == "Failed to create user.")
+            if (result == "Unauthorized")
             {
                 return BadRequest(result);
             }
-            
-            return Ok(result); 
+            else if (result == "Failed to create user.")
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
         }
 
 

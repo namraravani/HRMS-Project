@@ -99,27 +99,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "a13a24ac-81ab-4ee0-ba5d-dc930d913819",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "8960edd2-c74a-4f69-b27a-9586e97def59",
-                            Created_by = "a13a24ac-81ab-4ee0-ba5d-dc930d913819",
-                            Email = "namraravani8@gmail.com",
-                            EmailConfirmed = false,
-                            Is_Delete = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "449ED546C921FE530F94E99FBF7EF1C437E5B066940AB606C345576C0457332A",
-                            PhoneNumber = "9427662325",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "37619a3d-84a9-47f8-ade9-105165586862",
-                            TwoFactorEnabled = false,
-                            UserName = "Namra",
-                            firstName = "Namra",
-                            lastName = "Ravani"
-                        });
                 });
 
             modelBuilder.Entity("HRMS.POC.Project.Web.API.Models.Organization", b =>
@@ -138,14 +117,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Organizations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "0fd9682d-ed60-4cad-bb3f-60e8d223ca4d",
-                            address = "Gandhinagar",
-                            orgName = "Evision"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -173,32 +144,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "359557c0-ef90-4e28-8be4-62c9b0d4230a",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "9d4e0c58-e688-4827-9f68-1483c00f4877",
-                            Name = "HR",
-                            NormalizedName = "HR"
-                        },
-                        new
-                        {
-                            Id = "6c629aa2-0cfa-4a40-a8b7-a5a0cdfcbde2",
-                            Name = "Employee",
-                            NormalizedName = "EMPLOYEE"
-                        },
-                        new
-                        {
-                            Id = "a3313cd3-2c4f-4fa4-8629-b0822e8b78e9",
-                            Name = "SuperAdmin",
-                            NormalizedName = "SuperAdmin"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -286,13 +231,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "a13a24ac-81ab-4ee0-ba5d-dc930d913819",
-                            RoleId = "a3313cd3-2c4f-4fa4-8629-b0822e8b78e9"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -327,13 +265,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("OrganizationUsers");
-
-                    b.HasData(
-                        new
-                        {
-                            OrganizationId = "0fd9682d-ed60-4cad-bb3f-60e8d223ca4d",
-                            UserId = "a13a24ac-81ab-4ee0-ba5d-dc930d913819"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

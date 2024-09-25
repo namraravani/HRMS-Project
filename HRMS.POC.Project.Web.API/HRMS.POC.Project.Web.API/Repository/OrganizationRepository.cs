@@ -25,12 +25,12 @@ namespace HRMS.POC.Project.Web.API.Repository
         }
 
 
-        public async Task<IEnumerable<Organization>> GetUserOrganizationsAsync(string userId, string role)
+        public async Task<IEnumerable<Organization>> GetUserOrganizationsAsync(string userId,string role)
         {
             var sql = "GetUserOrganizations"; 
             using (var connection = CreateConnection())
             {
-                return await connection.QueryAsync<Organization>(sql, new { UserId = userId, Role = role }, commandType: CommandType.StoredProcedure);
+                return await connection.QueryAsync<Organization>(sql, new { UserId = userId,Role = role}, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -84,27 +84,25 @@ namespace HRMS.POC.Project.Web.API.Repository
                     throw new Exception("Object was not updated.");
                 }
 
-                return organizationDto; // Return the original DTO or map it back if necessary
+                return organizationDto; 
             }
         }
 
 
-        public async Task<Organization> UpdateOrganizations(Organization organization)
+        public async Task<Organization> UpdateOrganizationAsync(Organization organization)
         {
-            
-            var sql = $@"UPDATE Organizations SET orgName = @orgName,address = @address WHERE Id=@Id";
+            var sql = @"
+            UPDATE Organizations 
+            SET orgName = @orgName, address = @address 
+            WHERE Id = @Id; 
+            SELECT * FROM Organizations WHERE Id = @Id;";
 
             using (var connection = CreateConnection())
             {
-                await connection.ExecuteAsync(sql, organization);
-
-                if (organization == null)
-                {
-                    throw new Exception("Object is Not added");
-                }
-
-                return organization;
+                return await connection.QuerySingleOrDefaultAsync<Organization>(sql, organization);
             }
+
+
         }
         public async Task<Organization> RemoveOrganizationAsync(Organization organization)
         {
@@ -165,7 +163,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public async Task<Organization> FindOrganizationAsync()
         {
-            var sql = "SELECT TOP 1 * FROM Organizations"; // Adjust table name as needed
+            var sql = "SELECT TOP 1 * FROM Organizations"; 
 
             using (var connection = CreateConnection())
             {
@@ -183,6 +181,20 @@ namespace HRMS.POC.Project.Web.API.Repository
             }
            
         }
+
+        public async Task<bool> DeleteOrganizationAsync(string id)
+        {
+            var sql = "DELETE FROM Organizations WHERE Id = @Id;";
+
+            using (var connection = CreateConnection())
+            {
+                var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
+                return rowsAffected > 0; 
+            }
+            
+        }
+
+
 
 
     }

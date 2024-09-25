@@ -11,9 +11,9 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public Task<OrganizationDTO> AddOrganizationAsync(OrganizationDTO organizationDto);
 
-        public Task<Organization> UpdateOrganizations(Organization organization);
+        public Task<Organization> UpdateOrganizationAsync(Organization organization);
 
-        public Task<Organization> RemoveOrganizationAsync(Organization organization);
+        public Task<bool> DeleteOrganizationAsync(string id);
 
         public Task<string> GetOrganizationByName(string name);
 

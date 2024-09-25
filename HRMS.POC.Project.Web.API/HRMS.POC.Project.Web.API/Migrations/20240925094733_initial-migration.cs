@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace HRMS.POC.Project.Web.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class initialmigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,9 +30,10 @@ namespace HRMS.POC.Project.Web.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(21)", maxLength: 21, nullable: false),
+                    firstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    lastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Created_by = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Is_Delete = table.Column<bool>(type: "bit", nullable: true),
+                    Is_Delete = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -197,36 +196,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "1d87d319-7a8f-4110-a399-5a57525fb11c", null, "Employee", "EMPLOYEE" },
-                    { "3d7bec7d-6425-4210-9269-de92b8515ab9", null, "HR", "HR" },
-                    { "63c5c376-65e9-4465-a0d9-c38766b27a19", null, "Admin", "ADMIN" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Discriminator", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "61cb7f15-a37d-4672-b3a1-21b640fc98d5", 0, "a4f2cce3-b47d-43a7-88e4-82afcfd23684", "IdentityUser", "namraravani8@gmail.com", false, false, null, null, null, "449ED546C921FE530F94E99FBF7EF1C437E5B066940AB606C345576C0457332A", null, false, "9a273e48-5141-499f-93f8-429d239fa665", false, "Namra" });
-
-            migrationBuilder.InsertData(
-                table: "Organizations",
-                columns: new[] { "Id", "address", "orgName" },
-                values: new object[] { "dd6f42a2-afeb-4ac8-9881-701c0ba08966", "Gandhinagar", "Evision" });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUserRoles",
-                columns: new[] { "RoleId", "UserId" },
-                values: new object[] { "63c5c376-65e9-4465-a0d9-c38766b27a19", "61cb7f15-a37d-4672-b3a1-21b640fc98d5" });
-
-            migrationBuilder.InsertData(
-                table: "OrganizationUsers",
-                columns: new[] { "OrganizationId", "UserId" },
-                values: new object[] { "dd6f42a2-afeb-4ac8-9881-701c0ba08966", "61cb7f15-a37d-4672-b3a1-21b640fc98d5" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

@@ -60,7 +60,7 @@ namespace HRMS.POC.Project.Web.API.Models
                 new IdentityRole { Id = roleIdAdmin, Name = "Admin", NormalizedName = "ADMIN" },
                 new IdentityRole { Id = roleIdHR, Name = "HR", NormalizedName = "HR" },
                 new IdentityRole { Id = roleIdEmployee, Name = "Employee", NormalizedName = "EMPLOYEE" },
-                new IdentityRole { Id = roleIdSuperAdmin, Name = "SuperAdmin", NormalizedName = "SuperAdmin"}
+                new IdentityRole { Id = roleIdSuperAdmin, Name = "SuperAdmin", NormalizedName = "SUPERADMIN"}
             );
 
             
@@ -72,7 +72,7 @@ namespace HRMS.POC.Project.Web.API.Models
             
             var userId = Guid.NewGuid().ToString();
             builder.Entity<ApplicationUser>().HasData(
-                new ApplicationUser { Id = userId,firstName = "Namra",lastName = "Ravani" ,UserName = "Namra", Email = "namraravani8@gmail.com", PasswordHash = GetHashString("Namra@123"),Created_by = userId,PhoneNumber = "9427662325" }
+                new ApplicationUser { Id = userId,firstName = "Namra",lastName = "Ravani" ,UserName = "namraravani", Email = "namraravani8@gmail.com", PasswordHash = GetHashString("Namra@123"),Created_by = userId,PhoneNumber = "9427662325" }
             );
 
             
@@ -82,7 +82,7 @@ namespace HRMS.POC.Project.Web.API.Models
 
             
             builder.Entity<IdentityUserRole<string>>().HasData(
-                new IdentityUserRole<string> { UserId = userId, RoleId = roleIdSuperAdmin }
+                new IdentityUserRole<string> { UserId = userId, RoleId = roleIdAdmin }
             );
         }
     }

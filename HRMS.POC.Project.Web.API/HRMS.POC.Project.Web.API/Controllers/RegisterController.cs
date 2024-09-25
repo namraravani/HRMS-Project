@@ -14,8 +14,8 @@ using User.Management.API.Models.Login;
 
 namespace HRMS.POC.Project.Web.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/Register")]
     public class RegisterController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -35,12 +35,16 @@ namespace HRMS.POC.Project.Web.API.Controllers
             
         }
 
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterUser userDto)
+        [HttpPost("registration")]
+        public async Task<IActionResult> Registration([FromBody] RegisterUser userDto)
         {
             var result = await _userService.Register(userDto);
-            if (result == null) return BadRequest("User already exists.");
-            return Ok(result);
+            if (result == "0")
+            {
+                return BadRequest("hello there is an error");
+            }
+            if (result == null) return BadRequest("user already exists.");
+            return Ok(userDto);
         }
 
         [HttpPost("login")]

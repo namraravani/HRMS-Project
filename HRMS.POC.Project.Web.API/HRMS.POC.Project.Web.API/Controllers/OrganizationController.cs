@@ -29,26 +29,26 @@ namespace HRMS.POC.Project.Web.API.Controllers
             _organizationService = organizationService;
         }
 
-        [Authorize]
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Organization>>> GetOrganizations()
         {
-            ValidateUser();
+            
             var userId = UserId;
             var userRole = UserRole;
             
 
-            var result = await _organizationService.GetOrganizationAsync(userId, UserRole);
+            var result = await _organizationService.GetOrganizationAsync(userId,userRole);
             return Ok(result);
         }
 
-        
+
         //[HttpGet("{id}")]
         //public async Task<ActionResult<Organization>> GetOrganization(Guid id)
         //{
         //    var result = await _organizationRepository.GetOrganizationByIdAsync(id);
-            
-            
+
+
         //    if (result == null)
         //    {
         //        return NotFound();
@@ -58,45 +58,54 @@ namespace HRMS.POC.Project.Web.API.Controllers
         //}
 
 
-        //[HttpPost]
-        //public async Task<ActionResult<OrganizationDTO>> CreateOrganization(OrganizationDTO organization)
-        //{
-        //    var createdOrganization = await _organizationRepository.AddOrganizationAsync(organization);
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        public async Task<ActionResult<OrganizationDTO>> CreateOrganization([FromBody] CreateOrganizationRequest request)
+        {
+            var createdOrganization = await _organizationService.CreateOrganization(request.Organization, request.User, UserId);
 
-        //    return CreatedAtAction(nameof(GetOrganization), new { id = createdOrganization.Id }, createdOrganization);
-        //}
+            if (createdOrganization == null)
+            {
+                return BadRequest();
+            }
 
-
-        //// PUT: api/Organization/5
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateOrganization(string id, Organization organization)
-        //{
-        //    if (id != organization.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    await _organizationRepository.UpdateOrganizations(organization);
-
-        //    return Ok(organization);
-        //}
+            return Ok(createdOrganization); // Or return CreatedAtAction if desired
+        }
 
 
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateOrganization(string id, OrganizationDTO organizationDto)
+        {
+            if (id != organizationDto.Id)
+            {
+                return BadRequest("Organization ID mismatch.");
+            }
 
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteOrganization(Guid id)
-        //{
-        //    var organization = await _organizationRepository.GetOrganizationByIdAsync(id);
-        //    if (organization == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var updatedOrganization = await _organizationService.UpdateOrganizationAsync(organizationDto);
 
-            
-        //    await _organizationRepository.RemoveOrganizationAsync(organization);
+            if (updatedOrganization == null)
+            {
+                return NotFound("Organization not found.");
+            }
 
-        //    return Ok();
-        //}
+            return Ok(updatedOrganization);
+        }
+
+
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteOrganization(string id)
+        {
+            var result = await _organizationService.DeleteOrganizationAsync(id);
+
+            if (!result)
+            {
+                return NotFound("Organization not found.");
+            }
+
+            return NoContent(); // 204 No Content
+        }
 
         private bool OrganizationExists(string id)
         {

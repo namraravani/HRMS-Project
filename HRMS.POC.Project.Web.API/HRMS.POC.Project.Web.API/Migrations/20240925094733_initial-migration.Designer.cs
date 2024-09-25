@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS.POC.Project.Web.API.Migrations
 {
     [DbContext(typeof(HrmsDbContext))]
-    [Migration("20240923070713_corrected-application-user-table")]
-    partial class correctedapplicationusertable
+    [Migration("20240925094733_initial-migration")]
+    partial class initialmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Created_by")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
@@ -84,6 +83,14 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<string>("firstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("lastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -95,25 +102,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "0ac42624-4d86-4b1d-8104-2044e43e3461",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "58750e58-3d73-4916-ba21-dc4c11d017d3",
-                            Created_by = "0ac42624-4d86-4b1d-8104-2044e43e3461",
-                            Email = "namraravani8@gmail.com",
-                            EmailConfirmed = false,
-                            Is_Delete = false,
-                            LockoutEnabled = false,
-                            PasswordHash = "449ED546C921FE530F94E99FBF7EF1C437E5B066940AB606C345576C0457332A",
-                            PhoneNumber = "9427662325",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "7ee76163-83a9-4d0d-8af5-2b1f36440e90",
-                            TwoFactorEnabled = false,
-                            UserName = "Namra"
-                        });
                 });
 
             modelBuilder.Entity("HRMS.POC.Project.Web.API.Models.Organization", b =>
@@ -132,14 +120,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Organizations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "67316ae2-f4ea-41b6-926b-0f21dfe7ccdc",
-                            address = "Gandhinagar",
-                            orgName = "Evision"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -167,26 +147,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "fb9936db-8096-45a8-9b1f-cee7a60f58a3",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "54a5a166-9580-4638-9eb1-733d57440301",
-                            Name = "HR",
-                            NormalizedName = "HR"
-                        },
-                        new
-                        {
-                            Id = "38e39805-b6ef-442f-9c69-67b534c8fd8b",
-                            Name = "Employee",
-                            NormalizedName = "EMPLOYEE"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -274,13 +234,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "0ac42624-4d86-4b1d-8104-2044e43e3461",
-                            RoleId = "fb9936db-8096-45a8-9b1f-cee7a60f58a3"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -315,13 +268,6 @@ namespace HRMS.POC.Project.Web.API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("OrganizationUsers");
-
-                    b.HasData(
-                        new
-                        {
-                            OrganizationId = "67316ae2-f4ea-41b6-926b-0f21dfe7ccdc",
-                            UserId = "0ac42624-4d86-4b1d-8104-2044e43e3461"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -17,16 +17,16 @@ public class UserService : IUserService
 
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly string _jwtSecret;
-    private readonly IOrganizationService _organizationService;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
+    private readonly IOrganizationService _organizationService;
 
-    public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager, string jwtSecret, IOrganizationService organizationService, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
+    public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager,string jwtSecret, IOrganizationService organizationService, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
     {
         _userRepository = userRepository;
         _userManager = userManager;
-        _roleManager = roleManager;
         _jwtSecret = jwtSecret;
+        _roleManager = roleManager;
         _organizationService = organizationService;
         _configuration = configuration;
     }
@@ -74,15 +74,36 @@ public class UserService : IUserService
     public async Task<string> Login(LoginUser userDto)
     {
         var user = await _userManager.FindByNameAsync(userDto.Username);
-        if (user == null) return null;
+        if (user == null)
+        {
+            
+            Console.WriteLine($"User not found: {userDto.Username}");
+            return null;
+        }
 
         var passwordCheck = await _userManager.CheckPasswordAsync(user, userDto.Password);
-        if (!passwordCheck) return null;
-
+        if (!passwordCheck)
+        {
+            
+            Console.WriteLine("Password check failed for user: " + userDto.Username);
+            return null;
+        }
 
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-        var organizationId = await _organizationService.GetOrganizationIdByUserIdAsync(user.Id);
+        if (role == null)
+        {
+            
+            Console.WriteLine("No role found for user: " + userDto.Username);
+            return null;
+        }
 
+        var organizationId = await _organizationService.GetOrganizationIdByUserIdAsync(user.Id);
+        if (string.IsNullOrEmpty(organizationId))
+        {
+            
+            Console.WriteLine("No organization ID found for user: " + userDto.Username);
+            return null; 
+        }
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSecret);
@@ -94,7 +115,7 @@ public class UserService : IUserService
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Role, role),
             new Claim("OrganizationId", organizationId),
-            new Claim("UserId",user.Id)
+            new Claim("UserId", user.Id)
         }),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
@@ -107,6 +128,7 @@ public class UserService : IUserService
     }
 
 
+
     public async Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId)
     {
         return await _userRepository.GetUsersByOrganizationIdAsync(organizationId);
@@ -116,17 +138,17 @@ public class UserService : IUserService
     {
         if (role == "Employee")
         {
-            return "Unaothorized"; // Returns a 401 Unauthorized response
+            return "Unaothorized"; 
         }
 
         var newUserId = await _userRepository.AddUserAsync(user, creatorUserId, organizationId, assignedRole);
 
         if (newUserId == null)
         {
-            return "Failed to create user."; // Returns a 400 Bad Request response
+            return "Failed to create user.";
         }
 
-        return newUserId; // Returns a 200 OK response with newUserId
+        return newUserId;
     }
 
 

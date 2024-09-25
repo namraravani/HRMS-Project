@@ -28,17 +28,19 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 
 // Register services
-builder.Services.AddScoped<IOrganizationService, OrganizationService>(); // Add this line
-builder.Services.AddScoped<IUserService, UserService>(provider =>
-{   
+builder.Services.AddScoped<IOrganizationService, OrganizationService>(); 
+builder.Services.AddScoped<IUserService, UserService>(
+    provider =>
+{
     var userRepository = provider.GetRequiredService<IUserRepository>();
     var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
     var jwtSecret = builder.Configuration["JWT:Secret"];
     var organizationService = provider.GetRequiredService<IOrganizationService>();
     var configuration = provider.GetRequiredService<IConfiguration>();
     var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
-    return new UserService(userRepository, userManager, jwtSecret, organizationService,configuration,roleManager);
-});
+    return new UserService(userRepository, userManager, jwtSecret, organizationService, configuration, roleManager);
+}
+);
 
 // Configure JWT authentication
 builder.Services.AddAuthentication(options =>
@@ -58,8 +60,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UpdatePolicy", policy =>
+        policy.RequireRole("Admin"));
+});
+
 // Add controllers and Swagger
 builder.Services.AddControllers();
+builder.Services.AddScoped<DataSeeder>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
@@ -91,6 +101,14 @@ builder.Services.AddSwaggerGen(option =>
 
 // Build and run the application
 var app = builder.Build();
+app.UseHttpsRedirection();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dataSeeder = services.GetRequiredService<DataSeeder>();
+    await dataSeeder.SeedAsync(); // Make sure this is awaited
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -98,8 +116,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();
