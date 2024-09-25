@@ -50,24 +50,26 @@ namespace HRMS.POC.Project.Web.API.Models
 
         private static void SeedData(ModelBuilder builder)
         {
-            // Seed roles
+            
             var roleIdAdmin = Guid.NewGuid().ToString();
             var roleIdHR = Guid.NewGuid().ToString();
             var roleIdEmployee = Guid.NewGuid().ToString();
+            var roleIdSuperAdmin = Guid.NewGuid().ToString();
 
             builder.Entity<IdentityRole>().HasData(
                 new IdentityRole { Id = roleIdAdmin, Name = "Admin", NormalizedName = "ADMIN" },
                 new IdentityRole { Id = roleIdHR, Name = "HR", NormalizedName = "HR" },
-                new IdentityRole { Id = roleIdEmployee, Name = "Employee", NormalizedName = "EMPLOYEE" }
+                new IdentityRole { Id = roleIdEmployee, Name = "Employee", NormalizedName = "EMPLOYEE" },
+                new IdentityRole { Id = roleIdSuperAdmin, Name = "SuperAdmin", NormalizedName = "SuperAdmin"}
             );
 
-            // Seed organizations
+            
             var organizationId = Guid.NewGuid().ToString();
             builder.Entity<Organization>().HasData(
                 new Organization { Id = organizationId, orgName = "Evision", address = "Gandhinagar" }
             );
 
-            // Seed users
+            
             var userId = Guid.NewGuid().ToString();
             builder.Entity<ApplicationUser>().HasData(
                 new ApplicationUser { Id = userId,firstName = "Namra",lastName = "Ravani" ,UserName = "Namra", Email = "namraravani8@gmail.com", PasswordHash = GetHashString("Namra@123"),Created_by = userId,PhoneNumber = "9427662325" }
@@ -80,7 +82,7 @@ namespace HRMS.POC.Project.Web.API.Models
 
             
             builder.Entity<IdentityUserRole<string>>().HasData(
-                new IdentityUserRole<string> { UserId = userId, RoleId = roleIdAdmin }
+                new IdentityUserRole<string> { UserId = userId, RoleId = roleIdSuperAdmin }
             );
         }
     }

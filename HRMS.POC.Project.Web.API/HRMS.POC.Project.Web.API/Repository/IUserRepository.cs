@@ -1,4 +1,5 @@
 ﻿using HRMS.POC.Project.Web.API.Models;
+using HRMS.POC.Project.Web.API.Models.DTO;
 using Microsoft.AspNetCore.Identity;
 
 namespace HRMS.POC.Project.Web.API.Repository
@@ -17,5 +18,9 @@ namespace HRMS.POC.Project.Web.API.Repository
         public Task<ApplicationUser> GetUserByUsername(string username);
 
         public Task<string> AddUser(ApplicationUser user, string password, UserManager<ApplicationUser> userManager);
+
+        public Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId);
+
+        public Task<string> AddUserAsync(UserDTO userDto, string creatorUserId, string organizationId, string assignedRole);
     }
 }

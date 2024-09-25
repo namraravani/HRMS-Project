@@ -1,29 +1,31 @@
-﻿using Dapper;
+﻿using HRMS.POC.Project.Web.API.Models.DTO;
 using HRMS.POC.Project.Web.API.Models.Register;
 using HRMS.POC.Project.Web.API.Repository;
 using HRMS.POC.Project.Web.API.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using User.Management.API.Models.Login;
 
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
-    
+
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly string _jwtSecret;
     private readonly IOrganizationService _organizationService;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
 
-    public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager, string jwtSecret,IOrganizationService organizationService,IConfiguration configuration)
+    public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager, string jwtSecret, IOrganizationService organizationService, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
     {
         _userRepository = userRepository;
         _userManager = userManager;
+        _roleManager = roleManager;
         _jwtSecret = jwtSecret;
         _organizationService = organizationService;
         _configuration = configuration;
@@ -58,9 +60,9 @@ public class UserService : IUserService
 
         newUser.Created_by = newUser.Id;
 
-        
+
         var orgUserResult = await _organizationService.AddOrgUserAsync(newUser);
-        if (!orgUserResult.Success) 
+        if (!orgUserResult.Success)
         {
             return "Failed to add user to organization: " + orgUserResult.Message;
         }
@@ -69,11 +71,6 @@ public class UserService : IUserService
 
         return newUser.Id;
     }
-
-
-
-
-
     public async Task<string> Login(LoginUser userDto)
     {
         var user = await _userManager.FindByNameAsync(userDto.Username);
@@ -82,11 +79,11 @@ public class UserService : IUserService
         var passwordCheck = await _userManager.CheckPasswordAsync(user, userDto.Password);
         if (!passwordCheck) return null;
 
-        
-        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-        var organizationId = await _organizationService.GetOrganizationIdByUserIdAsync(user.Id); 
 
-       
+        var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+        var organizationId = await _organizationService.GetOrganizationIdByUserIdAsync(user.Id);
+
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSecret);
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -108,5 +105,34 @@ public class UserService : IUserService
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+
+
+    public async Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId)
+    {
+        return await _userRepository.GetUsersByOrganizationIdAsync(organizationId);
+    }
+
+    public async Task<string> ValidateUserForAdd(string role, UserDTO user, string creatorUserId, string organizationId, string assignedRole)
+    {
+        if (role == "Employee")
+        {
+            return "Unaothorized"; // Returns a 401 Unauthorized response
+        }
+
+        var newUserId = await _userRepository.AddUserAsync(user, creatorUserId, organizationId, assignedRole);
+
+        if (newUserId == null)
+        {
+            return "Failed to create user."; // Returns a 400 Bad Request response
+        }
+
+        return newUserId; // Returns a 200 OK response with newUserId
+    }
+
+
+
+
+
+
 
 }

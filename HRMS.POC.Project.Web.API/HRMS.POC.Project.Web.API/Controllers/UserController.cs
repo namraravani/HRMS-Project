@@ -2,6 +2,7 @@
 using HRMS.POC.Project.Web.API.Models.DTO;
 using HRMS.POC.Project.Web.API.Models.Register;
 using HRMS.POC.Project.Web.API.Repository;
+using HRMS.POC.Project.Web.API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -13,39 +14,62 @@ namespace HRMS.POC.Project.Web.API.Controllers
     [ApiController]
     public class UserController : BaseController
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         
 
-        public UserController(IUserRepository userRepository, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UserController(IUserService userService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            _userRepository = userRepository;
+            _userService = userService;
             _userManager = userManager;
             _roleManager = roleManager;
             
         }
 
 
-        
+        [Authorize]
         [HttpGet]
-        public async Task<IEnumerable<ApplicationUser>> GetUsers()
+        public async Task<IEnumerable<UserDTO>> GetUsers()
         {
-            var users = await _userRepository.GetUsersAsync();
+            ValidateUser();
+            var Organizationid = OrganizationId;
+            var users = await _userService.GetUsersByOrganizationIdAsync(Organizationid);
             return users;
         }
 
+        [Authorize]
         [HttpPost]
-        public async Task<IActionResult> GetUserById(string id)
+        public async Task<IActionResult> AddUser(UserDTO user, string assignedRole)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
-            if (user == null) {
-                
-                return NotFound();
+            
+            var result = await _userService.ValidateUserForAdd(UserRole, user, UserId, OrganizationId, assignedRole);
+
+            if(result == "Unauthorized")
+            {
+                return BadRequest(result);  
+            }
+            else if(result == "Failed to create user.")
+            {
+                return BadRequest(result);
             }
             
-            return Ok(user);
+            return Ok(result); 
         }
+
+
+
+        //[HttpPost]
+        //public async Task<IActionResult> GetUserById(string id)
+        //{
+        //    var user = await _userRepository.GetUserByIdAsync(id);
+        //    if (user == null) {
+
+        //        return NotFound();
+        //    }
+
+        //    return Ok(user);
+        //}
 
         //[HttpPost("create")]
         //public async Task<IActionResult> UserCreateAsync([FromBody] RegisterUser registerUser, string role)
@@ -64,7 +88,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         //        firstName = registerUser.firstName, 
         //        lastName = registerUser.lastName
         //    };
-                
+
         //    if (await _roleManager.RoleExistsAsync(role))
         //    {
         //        var result = await _userManager.CreateAsync(user, registerUser.Password);
@@ -124,7 +148,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         //        return NotFound();
         //    }
 
-            
+
         //    existingUser.UserName = user.UserName;
         //    existingUser.Email = user.Email;
         //    existingUser.PhoneNumber = user.PhoneNumber;
@@ -141,23 +165,23 @@ namespace HRMS.POC.Project.Web.API.Controllers
 
 
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(string id)
-        {
-            var user = await _userRepository.GetUserByIdAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteUser(string id)
+        //{
+        //    var user = await _userRepository.GetUserByIdAsync(id);
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var deletedUser = await _userRepository.DeleteUserAsync(user);
-            if (deletedUser == null)
-            {
-                return NotFound();
-            }
+        //    var deletedUser = await _userRepository.DeleteUserAsync(user);
+        //    if (deletedUser == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return Ok(new { Message = "User deleted successfully!" });
-        }
+        //    return Ok(new { Message = "User deleted successfully!" });
+        //}
 
 
     }

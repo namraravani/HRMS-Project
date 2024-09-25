@@ -29,14 +29,14 @@ namespace HRMS.POC.Project.Web.API.Controllers
             _organizationService = organizationService;
         }
 
-        
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Organization>>> GetOrganizations()
         {
             ValidateUser();
             var userId = UserId;
             var userRole = UserRole;
-            var organizationId = OrganizationId;
+            
 
             var result = await _organizationService.GetOrganizationAsync(userId, UserRole);
             return Ok(result);

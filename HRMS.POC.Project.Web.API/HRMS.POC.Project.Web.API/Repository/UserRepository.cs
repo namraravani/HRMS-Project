@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using HRMS.POC.Project.Web.API.Models;
+using HRMS.POC.Project.Web.API.Models.DTO;
 using HRMS_POC_Project.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
@@ -12,8 +13,12 @@ namespace HRMS.POC.Project.Web.API.Repository
     public class UserRepository : IUserRepository
     {
         private readonly string _connectionString;
-        public UserRepository(IOptions<DatabaseConfig> dbConfig) {
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public UserRepository(IOptions<DatabaseConfig> dbConfig,UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager) {
             _connectionString = dbConfig.Value.ConnectionString;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         private IDbConnection CreateConnection()
@@ -89,6 +94,62 @@ namespace HRMS.POC.Project.Web.API.Repository
             }
 
             return user.Id; 
+        }
+
+        public async Task<string> AddUserAsync(UserDTO userDto, string creatorUserId, string organizationId, string assignedRole)
+        {
+            
+            var newUser = new ApplicationUser
+            {
+                UserName = userDto.UserName,
+                Email = userDto.Email,
+                PhoneNumber = userDto.PhoneNumber,
+                firstName = userDto.FirstName,
+                lastName = userDto.LastName,
+                Created_by = creatorUserId
+            };
+
+            
+            var result = await _userManager.CreateAsync(newUser, userDto.Password);
+            if (!result.Succeeded)
+            {
+                
+                return null; 
+            }
+
+            
+            if (!string.IsNullOrEmpty(assignedRole) && await _roleManager.RoleExistsAsync(assignedRole))
+            {
+                await _userManager.AddToRoleAsync(newUser, assignedRole);
+            }
+
+            
+            var sql = @"INSERT INTO OrganizationUsers (UserId, OrganizationId) VALUES (@UserId, @OrganizationId)";
+            using (var connection = CreateConnection())
+            {
+                await connection.ExecuteAsync(sql, new
+                {
+                    UserId = newUser.Id,
+                    OrganizationId = organizationId
+                });
+            }
+
+            return newUser.Id;
+        }
+
+
+
+
+        public async Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId)
+        {
+            var sql = "GetUsersByOrganizationId"; // Stored procedure name
+            var parameters = new { OrganizationId = organizationId }; // Parameters to pass
+
+            using (var connection = CreateConnection()) {
+                return await connection.QueryAsync<UserDTO>(sql, parameters, commandType: CommandType.StoredProcedure);
+            }
+
+            
         }
 
 
