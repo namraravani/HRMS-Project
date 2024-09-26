@@ -110,11 +110,11 @@ namespace HRMS.POC.Project.Web.API.Services
 
         public async Task<bool> DeleteOrganizationAsync(string id)
         {
-            
+           
             var userIds = await _organizationRepository.FetchUsersFromOrganizationIdAsync(id);
             bool allDeleted = true;
 
-            
+            // Loop through each userId and attempt to delete
             foreach (var userId in userIds)
             {
                 var userDeleted = await _userRepository.DeleteUserForOrganizationAsync(userId);
@@ -124,7 +124,7 @@ namespace HRMS.POC.Project.Web.API.Services
                 }
             }
 
-            return allDeleted;
+            return allDeleted; 
         }
 
 

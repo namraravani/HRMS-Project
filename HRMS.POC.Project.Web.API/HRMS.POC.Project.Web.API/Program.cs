@@ -99,6 +99,27 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("GetOrganizationPolicy", policy =>
+        policy.RequireRole("Admin","HR","Employee","SuperAdmin"));
+    options.AddPolicy("CreateOrganizationPolicy", policy =>
+        policy.RequireRole("SuperAdmin"));
+    options.AddPolicy("UpdateOrganizationPolicy", policy =>
+        policy.RequireRole("Admin", "SuperAdmin"));
+    options.AddPolicy("DeleteOrganizationPolicy", policy =>
+        policy.RequireRole("Admin", "SuperAdmin"));
+    options.AddPolicy("GetUsersPolicy", policy =>
+        policy.RequireRole("Admin", "SuperAdmin", "HR", "Employee"));
+    options.AddPolicy("UpdateUsersPolicy", policy =>
+        policy.RequireRole("Admin", "SuperAdmin", "HR"));
+    options.AddPolicy("DeleteUsersPolicy", policy =>
+        policy.RequireRole("Admin", "SuperAdmin", "HR"));
+    options.AddPolicy("CreateUsersPolicy", policy =>
+        policy.RequireRole("Admin", "SuperAdmin", "HR"));
+
+});
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -108,20 +129,20 @@ using (var scope = app.Services.CreateScope())
     {
         var dbContext = services.GetRequiredService<HrmsDbContext>();
 
-        // Apply pending migrations
+        
         await dbContext.Database.MigrateAsync();
 
-        // Get UserManager and RoleManager
+        
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-        // Seed data
+        
         var seeder = new DataSeeder(userManager, roleManager, dbContext);
         await seeder.SeedAsync();
     }
     catch (Exception ex)
     {
-        // Handle errors (optional logging, etc.)
+        
         Console.WriteLine($"Error during migration/seeding: {ex.Message}");
     }
 }

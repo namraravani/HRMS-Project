@@ -192,6 +192,18 @@ namespace HRMS.POC.Project.Web.API.Repository
             }
             
         }
+        public async Task<IEnumerable<string>> FetchUsersFromOrganizationIdAsync(string organizationId)
+        {
+            var sql = "SELECT UserId FROM OrganizationUsers WHERE OrganizationId = @Id;";
+
+            using (var connection = CreateConnection())
+            {  
+                var userIds = await connection.QueryAsync<string>(sql, new { Id = organizationId });
+                return userIds; 
+            }
+        }
+
+
 
 
     }

@@ -29,7 +29,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
             _organizationService = organizationService;
         }
 
-
+        [Authorize(Policy = "GetOrganizationPolicy")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Organization>>> GetOrganizations()
         {
@@ -46,7 +46,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         
 
 
-        [Authorize(Roles = "SuperAdmin")]
+        [Authorize(Policy = "CreateOrganizationPolicy")]
         [HttpPost]
         public async Task<ActionResult<OrganizationDTO>> CreateOrganization([FromBody] CreateOrganizationRequest request)
         {
@@ -61,7 +61,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         }
 
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "UpdateOrganizationPolicy")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOrganization(string id, OrganizationDTO organizationDto)
         {
@@ -81,7 +81,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         }
 
 
-
+        [Authorize(Policy = "DeleteOrganizationPolicy")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrganization(string id)
         {
@@ -95,10 +95,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return NoContent(); 
         }
 
-        private bool OrganizationExists(string id)
-        {
-            return _context.Organizations.Any(e => e.Id == id);
-        }
+        
 
     }
 }

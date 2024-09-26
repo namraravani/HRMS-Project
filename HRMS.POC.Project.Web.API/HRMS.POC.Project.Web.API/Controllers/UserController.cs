@@ -13,6 +13,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
@@ -29,7 +30,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         }
 
 
-        [Authorize]
+        [Authorize(Policy = "GetUsersPolicy")]
         [HttpGet]
         public async Task<IEnumerable<UserDTO>> GetUsers()
         {
@@ -39,7 +40,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return users;
         }
 
-        [Authorize]
+        [Authorize(Policy = "CreateUsersPolicy")]
         [HttpPost]
         public async Task<IActionResult> AddUser(UserDTO user, string assignedRole)
         {
@@ -103,7 +104,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         //}
 
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "UpdateUsersPolicy")]
         [HttpPost("{id}")]
         public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto updateUserDto)
         {
@@ -147,7 +148,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return Ok("User updated successfully.");
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "DeleteUsersPolicy")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
