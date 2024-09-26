@@ -23,6 +23,10 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         Task<string> GetOrganizationIdByUserIdAsync(string userId);
 
+        public Task<IEnumerable<string>> FetchUsersFromOrganizationIdAsync(string organizationId);
+
+
+
 
 
     }

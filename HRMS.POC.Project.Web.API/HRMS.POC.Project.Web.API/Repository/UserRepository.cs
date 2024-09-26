@@ -45,21 +45,6 @@ namespace HRMS.POC.Project.Web.API.Repository
             }
         }
 
-        public async Task<ApplicationUser> UpdateUserAsync(ApplicationUser user)
-        {
-            var sql = "UPDATE AspNetUsers SET UserName = @UserName, Email = @Email, firstName = @firstName, lastName = @lastName, Is_Delete = @Is_Delete, Created_by = @Created_by WHERE Id = @Id";
-
-            using (var connection = CreateConnection())
-            {
-                var affectedRows = await connection.ExecuteAsync(sql, user);
-                return affectedRows > 0 ? user : null; 
-            }
-        }
-
-        
-
-
-
         public async Task<ApplicationUser> DeleteUserAsync(ApplicationUser user)
         {
             var sql = "UPDATE AspNetUsers SET Is_Delete = 1 WHERE Id = @Id";
@@ -67,9 +52,54 @@ namespace HRMS.POC.Project.Web.API.Repository
             using (var connection = CreateConnection())
             {
                 var affectedRows = await connection.ExecuteAsync(sql, new { Id = user.Id });
-                return affectedRows > 0 ? user : null; 
+                return affectedRows > 0 ? user : null;
             }
         }
+
+        public async Task<bool> DeleteUserForOrganizationAsync(string userId)
+        {
+            var sql = "UPDATE AspNetUsers SET Is_Delete = 1 WHERE Id = @Id";
+
+            using (var connection = CreateConnection())
+            {
+                var affectedRows = await connection.ExecuteAsync(sql, new { Id = userId });
+                return affectedRows > 0; 
+            }
+        }
+
+
+
+        public async Task<bool> UpdateUserAsync(ApplicationUser user)
+        {
+            var sql = @"
+        UPDATE AspNetUsers 
+        SET UserName = @UserName, 
+            Email = @Email, 
+            PhoneNumber = @PhoneNumber,
+            firstName = @FirstName,
+            lastName = @LastName,
+            SecurityStamp = @SecurityStamp
+        WHERE Id = @Id";
+
+            var parameters = new
+            {
+                user.UserName,
+                user.Email,
+                user.PhoneNumber,
+                user.firstName,
+                user.lastName,
+                SecurityStamp = Guid.NewGuid().ToString(), 
+                user.Id
+            };
+
+            using (var connection = CreateConnection())
+            {
+                var rowsAffected = await connection.ExecuteAsync(sql, parameters);
+                return rowsAffected > 0;
+            }
+        }
+
+        
 
         public async Task<ApplicationUser> GetUserByUsername(string username)
         {

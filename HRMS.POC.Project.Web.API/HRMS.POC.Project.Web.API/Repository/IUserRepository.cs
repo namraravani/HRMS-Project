@@ -11,7 +11,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public Task<ApplicationUser> GetUserByIdAsync(string id);
 
-        public Task<ApplicationUser> UpdateUserAsync(ApplicationUser user);
+        public Task<bool> UpdateUserAsync(ApplicationUser user);
 
         public Task<ApplicationUser> DeleteUserAsync(ApplicationUser user);
 
@@ -20,6 +20,8 @@ namespace HRMS.POC.Project.Web.API.Repository
         public Task<string> AddUser(ApplicationUser user, string password, UserManager<ApplicationUser> userManager);
 
         public Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId);
+
+        public Task<bool> DeleteUserForOrganizationAsync(string userId);
 
         public Task<string> AddUserAsync(UserDTO userDto, string creatorUserId, string organizationId, string assignedRole);
     }

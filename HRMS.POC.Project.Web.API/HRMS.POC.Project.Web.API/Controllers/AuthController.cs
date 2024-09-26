@@ -16,7 +16,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
 {
     [ApiController]
     [Route("api/Register")]
-    public class RegisterController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -25,7 +25,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
 
         private readonly IConfiguration _configuration;
 
-        public RegisterController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, HrmsDbContext dbContext,IUserService userService)
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, HrmsDbContext dbContext,IUserService userService)
         {
             _userManager = userManager;
             _roleManager = roleManager;

@@ -12,25 +12,27 @@ namespace HRMS.POC.Project.Web.API.Services
         private readonly IOrganizationRepository _organizationRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUserRepository _userRepository;
 
-        public OrganizationService(IOrganizationRepository organizationRepository,UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager)
+        public OrganizationService(IOrganizationRepository organizationRepository,UserManager<ApplicationUser> userManager,RoleManager<IdentityRole> roleManager,IUserRepository userRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _organizationRepository = organizationRepository;
+            _userRepository = userRepository;
             
         }
 
         public async Task<string> CreateOrganization(OrganizationDTO organizationDto, UserDTO userDto, string createdUserId)
         {
-            // Step 1: Add the organization
+            
             var organizationId = await _organizationRepository.AddOrganizationAsync(organizationDto);
             if (string.IsNullOrEmpty(organizationId))
             {
-                return null; // Return or handle the error
+                return null;
             }
 
-            // Step 2: Create the user
+           
             var newUser = new ApplicationUser
             {
                 UserName = userDto.UserName,
@@ -40,31 +42,31 @@ namespace HRMS.POC.Project.Web.API.Services
                 lastName = userDto.LastName,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 Is_Delete = false,
-                Created_by = createdUserId // Set created by before user creation
+                Created_by = createdUserId 
             };
 
             var createUserResult = await _userManager.CreateAsync(newUser, userDto.Password);
             if (!createUserResult.Succeeded)
             {
-                // Log errors or handle them accordingly
+                
                 return null;
             }
 
-            // Step 3: Assign role if not already assigned
+            
             if (!await _userManager.IsInRoleAsync(newUser, "Admin"))
             {
                 await _userManager.AddToRoleAsync(newUser, "Admin");
             }
 
-            // Step 4: Add the user to the organization
+            
             var addOrgUserResult = await AddOrgUserAsync(newUser, organizationId);
             if (!addOrgUserResult.Success)
             {
-                // Handle failure to add user to organization
+               
                 return null;
             }
 
-            return organizationId; // Return the ID of the newly created organization
+            return organizationId; 
         }
 
         public async Task<IEnumerable<Organization>> GetOrganizationAsync(string userId, string role) {
@@ -82,7 +84,7 @@ namespace HRMS.POC.Project.Web.API.Services
                 return (false, "Organization does not exist.");
             }
 
-            // Ensure that the user is linked to the organization correctly
+           
             var result = await _organizationRepository.AddUserToOrganization(orgExist.Id, user);
 
             return result ? (true, "User added to organization successfully.") : (false, "Failed to add user to organization.");
@@ -109,8 +111,23 @@ namespace HRMS.POC.Project.Web.API.Services
         public async Task<bool> DeleteOrganizationAsync(string id)
         {
             
-            return await _organizationRepository.DeleteOrganizationAsync(id);
+            var userIds = await _organizationRepository.FetchUsersFromOrganizationIdAsync(id);
+            bool allDeleted = true;
+
+            
+            foreach (var userId in userIds)
+            {
+                var userDeleted = await _userRepository.DeleteUserForOrganizationAsync(userId);
+                if (userDeleted == null) 
+                {
+                    allDeleted = false;
+                }
+            }
+
+            return allDeleted;
         }
+
+
 
 
     }

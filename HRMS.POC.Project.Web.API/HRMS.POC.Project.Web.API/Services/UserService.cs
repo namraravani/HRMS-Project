@@ -151,21 +151,43 @@ public class UserService : IUserService
         return newUserId;
     }
 
-    public async Task<bool> CheckUserForUpdate(string userId, string accessorId)
+    public async Task<ApplicationUser> CheckUserForUpdate(string userId, string accessorId)
     {
         var user = await _userRepository.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return null;
+        }
+
+       
+        return user.Created_by == accessorId ? user : null;
+    }
+
+    public async Task<bool> UpdateUser(ApplicationUser user)
+    {
+        return await _userRepository.UpdateUserAsync(user);
+    }
+
+    public async Task<ApplicationUser> GetUserByIdAsync(string id)
+    {
+        return await _userRepository.GetUserByIdAsync(id);
+    }
+
+    public async Task<bool> DeleteUserAsync(string id)
+    {
+        var user = await GetUserByIdAsync(id);
         if (user == null)
         {
             return false; 
         }
 
-        
-        return user.Created_by == accessorId;
+        var deletedUser = await _userRepository.DeleteUserAsync(user);
+        return deletedUser != null; 
     }
 
 
 
-    
+
 
 
 

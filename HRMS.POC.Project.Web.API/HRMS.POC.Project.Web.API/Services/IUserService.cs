@@ -13,8 +13,14 @@ namespace HRMS.POC.Project.Web.API.Services
 
         public Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId);
 
-        public Task<bool> CheckUserForUpdate(string userId, string accessorId);
+        public Task<ApplicationUser> CheckUserForUpdate(string userId, string accessorId);
+
+        public Task<bool> UpdateUser(ApplicationUser user);
 
         public Task<string> ValidateUserForAdd(string role, UserDTO user, string creatorUserId, string organizationId, string assignedRole);
+
+        public Task<ApplicationUser> GetUserByIdAsync(string id);
+
+        public Task<bool> DeleteUserAsync(string id);
     }
 }

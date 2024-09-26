@@ -57,39 +57,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
 
             return Ok(result);
         }
-
-        [Authorize(Roles = "Admin, HR")]
-        [HttpPost]
-        public async Task<IActionResult> updateUser(string userId)
-        {
-            string accessorId = UserId; 
-
-            
-           
-
-            if (UserRole == null)
-            {
-                return BadRequest("User is not authorized to update.");
-            }
-
-            
-            if (UserRole == "HR")
-            {
-                var canUpdate = await _userService.CheckUserForUpdate(userId, accessorId);
-                if (!canUpdate)
-                {
-                    return BadRequest("You are not authorized to update this user.");
-                }
-            }
-
-            await _userService.UpdateUser(userId);
-
-            return Ok("User is updated.");
-        }
-
-
-
-
+        //[Authorize]
         //[HttpPost]
         //public async Task<IActionResult> GetUserById(string id)
         //{
@@ -134,46 +102,42 @@ namespace HRMS.POC.Project.Web.API.Controllers
         //    return BadRequest("Role does not exist.");
         //}
 
-        // PUT: api/user/update/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userDto)
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{id}")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto updateUserDto)
         {
-            if (userDto == null)
+            if (updateUserDto == null)
             {
                 return BadRequest("Invalid user data.");
             }
 
-            // Get the accessor ID and role from the current user context
-            var accessorId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Adjust as necessary
-            var userRole = User.FindFirstValue(ClaimTypes.Role); // Assuming you have this set up
+            var accessorId = UserId;
+            var roleId = UserRole; 
 
-            // Check if the user exists
-            var existingUser = await _userRepository.GetUserByIdAsync(id);
+            
+            var existingUser = await _userService.CheckUserForUpdate(id, accessorId);
             if (existingUser == null)
             {
-                return NotFound();
+                return NotFound("User not found or not authorized to update.");
             }
 
-            // Check roles
-            if (userRole == "HR")
+            
+            if (roleId == "HR" && existingUser.Created_by != accessorId)
             {
-                // Check if HR is authorized based on created_by ID
-                if (existingUser.CreatedBy != accessorId)
-                {
-                    return Forbid(); // 403 Forbidden if HR is not authorized
-                }
+                return Forbid(); 
             }
-            else if (userRole != "Admin")
+            else if (roleId != "Admin")
             {
-                return Forbid(); // Only Admin can perform updates if not HR
+                return Forbid(); 
             }
 
-            // Update user properties
-            existingUser.UserName = userDto.UserName ?? existingUser.UserName;
-            existingUser.firstName = userDto.FirstName ?? existingUser.firstName;
-            existingUser.lastName = userDto.LastName ?? existingUser.lastName;
+            
+            existingUser.UserName = updateUserDto.UserName ?? existingUser.UserName;
+            existingUser.firstName = updateUserDto.FirstName ?? existingUser.firstName;
+            existingUser.lastName = updateUserDto.LastName ?? existingUser.lastName;
 
-            // Call the service to update the user
+            
             var updateSuccess = await _userService.UpdateUser(existingUser);
             if (!updateSuccess)
             {
@@ -183,58 +147,20 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return Ok("User updated successfully.");
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            
+            var deleteSuccess = await _userService.DeleteUserAsync(id);
+            if (!deleteSuccess)
+            {
+                return NotFound("User not found or could not be deleted.");
+            }
 
+            return Ok(new { Message = "User deleted successfully!" });
+        }
 
-
-
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateUser(string id, [FromBody] ApplicationUser user)
-        //{
-        //    if (user == null || string.IsNullOrEmpty(user.Id) || user.Id != id)
-        //    {
-        //        return BadRequest("Invalid user data.");
-        //    }
-
-        //    var existingUser = await _userRepository.GetUserByIdAsync(id);
-        //    if (existingUser == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-
-        //    existingUser.UserName = user.UserName;
-        //    existingUser.Email = user.Email;
-        //    existingUser.PhoneNumber = user.PhoneNumber;
-        //    existingUser.Created_by = user.Created_by; 
-
-        //    var updatedUser = await _userRepository.UpdateUserAsync(existingUser);
-        //    if (updatedUser == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(updatedUser);
-        //}
-
-
-
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteUser(string id)
-        //{
-        //    var user = await _userRepository.GetUserByIdAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var deletedUser = await _userRepository.DeleteUserAsync(user);
-        //    if (deletedUser == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(new { Message = "User deleted successfully!" });
-        //}
 
 
     }
