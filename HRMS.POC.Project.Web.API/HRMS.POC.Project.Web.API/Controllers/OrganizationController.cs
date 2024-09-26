@@ -43,22 +43,10 @@ namespace HRMS.POC.Project.Web.API.Controllers
         }
 
 
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<Organization>> GetOrganization(Guid id)
-        //{
-        //    var result = await _organizationRepository.GetOrganizationByIdAsync(id);
+        
 
 
-        //    if (result == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(result);
-        //}
-
-
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         [HttpPost]
         public async Task<ActionResult<OrganizationDTO>> CreateOrganization([FromBody] CreateOrganizationRequest request)
         {
@@ -69,7 +57,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
                 return BadRequest();
             }
 
-            return Ok(createdOrganization); // Or return CreatedAtAction if desired
+            return Ok(createdOrganization); 
         }
 
 
@@ -104,7 +92,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
                 return NotFound("Organization not found.");
             }
 
-            return NoContent(); // 204 No Content
+            return NoContent(); 
         }
 
         private bool OrganizationExists(string id)

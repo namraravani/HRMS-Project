@@ -7,6 +7,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System.Data;
 using System.Data.Common;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace HRMS.POC.Project.Web.API.Repository
 {
@@ -54,6 +55,8 @@ namespace HRMS.POC.Project.Web.API.Repository
                 return affectedRows > 0 ? user : null; 
             }
         }
+
+        
 
 
 
@@ -137,13 +140,46 @@ namespace HRMS.POC.Project.Web.API.Repository
             return newUser.Id;
         }
 
+        
+
+        public async Task<bool> UpdateUser(ApplicationUser user)
+        {
+            var sql = @"
+            UPDATE AspNetUsers 
+            SET UserName = @UserName, 
+                Email = @Email, 
+                PhoneNumber = @PhoneNumber,
+                firstName = @FirstName,
+                lastName = @LastName,
+                SecurityStamp = @SecurityStamp
+            WHERE Id = @Id"; 
+
+            using (var connection = CreateConnection())
+            {
+                var rowsAffected = await connection.ExecuteAsync(sql, new
+                {
+                    user.UserName,
+                    user.Email,
+                    user.PhoneNumber,
+                    user.firstName,
+                    user.lastName,
+                    SecurityStamp = Guid.NewGuid().ToString(), 
+                    user.Id
+                });
+
+                return rowsAffected > 0;
+            }
+
+            
+        }
+
 
 
 
         public async Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId)
         {
-            var sql = "GetUsersByOrganizationId"; // Stored procedure name
-            var parameters = new { OrganizationId = organizationId }; // Parameters to pass
+            var sql = "GetUsersByOrganizationId";
+            var parameters = new { OrganizationId = organizationId }; 
 
             using (var connection = CreateConnection()) {
                 return await connection.QueryAsync<UserDTO>(sql, parameters, commandType: CommandType.StoredProcedure);

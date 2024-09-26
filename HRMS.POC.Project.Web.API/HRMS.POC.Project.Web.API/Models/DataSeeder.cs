@@ -23,48 +23,73 @@ public class DataSeeder
         {
             if (!await _roleManager.RoleExistsAsync(role))
             {
-                await _roleManager.CreateAsync(new IdentityRole(role));
+                var roleResult = await _roleManager.CreateAsync(new IdentityRole(role));
+                if (!roleResult.Succeeded)
+                {
+                    Console.WriteLine($"Failed to create role: {role}. Errors: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+                    return; // Exit if any role fails to create
+                }
             }
         }
 
-        var Id = Guid.NewGuid().ToString();
-        var user = new ApplicationUser
+        // Check if the SuperAdmin user already exists
+        var superAdminEmail = "namraravani8@gmail.com";
+        var superAdminUser = await _userManager.FindByEmailAsync(superAdminEmail);
+        if (superAdminUser == null)
         {
-            Id = Id,
-            firstName = "Namra",
-            lastName = "Ravani",
-            UserName = "namraravani",
-            Email = "namraravani8@gmail.com",
-            PhoneNumber = "9427662325",
-            Created_by = Id 
-        };
-
-        var result = await _userManager.CreateAsync(user, "Namra@123");
-        if (result.Succeeded)
-        {
-            // Assign role to the user
-            await _userManager.AddToRoleAsync(user, "SuperAdmin");
-
-            // Seed organization
-            var organization = new Organization
+            var Id = Guid.NewGuid().ToString();
+            var user = new ApplicationUser
             {
-                Id = Guid.NewGuid().ToString(),
-                orgName = "Evision",
-                address = "Gandhinagar"
+                Id = Id,
+                firstName = "Namra",
+                lastName = "Ravani",
+                UserName = "namraravani",
+                Email = superAdminEmail,
+                PhoneNumber = "9427662325",
+                Created_by = Id
             };
 
-            await _dbContext.Organizations.AddAsync(organization);
-            await _dbContext.SaveChangesAsync();
-
-            // Seed OrganizationUser
-            var organizationUser = new OrganizationUser
+            var result = await _userManager.CreateAsync(user, "Namra@123");
+            if (result.Succeeded)
             {
-                OrganizationId = organization.Id,
-                UserId = user.Id
-            };
+                // Assign role to the user
+                var roleResult = await _userManager.AddToRoleAsync(user, "SuperAdmin");
+                if (!roleResult.Succeeded)
+                {
+                    Console.WriteLine($"Failed to assign role to SuperAdmin. Errors: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
+                    return;
+                }
 
-            await _dbContext.OrganizationUsers.AddAsync(organizationUser);
-            await _dbContext.SaveChangesAsync();
+                // Seed organization
+                var organization = new Organization
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    orgName = "Evision",
+                    address = "Gandhinagar"
+                };
+
+                await _dbContext.Organizations.AddAsync(organization);
+                await _dbContext.SaveChangesAsync();
+
+                // Seed OrganizationUser
+                var organizationUser = new OrganizationUser
+                {
+                    OrganizationId = organization.Id,
+                    UserId = user.Id
+                };
+
+                await _dbContext.OrganizationUsers.AddAsync(organizationUser);
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                Console.WriteLine($"Failed to create SuperAdmin user. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("SuperAdmin user already exists.");
         }
     }
+
 }

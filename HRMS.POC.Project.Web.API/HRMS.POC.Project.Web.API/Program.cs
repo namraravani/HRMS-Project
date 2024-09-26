@@ -66,7 +66,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin"));
 });
 
-// Add controllers and Swagger
+
 builder.Services.AddControllers();
 builder.Services.AddScoped<DataSeeder>();
 
@@ -99,15 +99,39 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-// Build and run the application
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var dbContext = services.GetRequiredService<HrmsDbContext>();
+
+        // Apply pending migrations
+        await dbContext.Database.MigrateAsync();
+
+        // Get UserManager and RoleManager
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        // Seed data
+        var seeder = new DataSeeder(userManager, roleManager, dbContext);
+        await seeder.SeedAsync();
+    }
+    catch (Exception ex)
+    {
+        // Handle errors (optional logging, etc.)
+        Console.WriteLine($"Error during migration/seeding: {ex.Message}");
+    }
+}
 app.UseHttpsRedirection();
 
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var dataSeeder = services.GetRequiredService<DataSeeder>();
-    await dataSeeder.SeedAsync(); // Make sure this is awaited
+    await dataSeeder.SeedAsync(); 
 }
 
 if (app.Environment.IsDevelopment())

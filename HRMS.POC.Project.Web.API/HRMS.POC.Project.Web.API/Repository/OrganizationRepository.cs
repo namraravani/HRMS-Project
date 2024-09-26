@@ -53,9 +53,9 @@ namespace HRMS.POC.Project.Web.API.Repository
             }
         }
 
-        public async Task<OrganizationDTO> AddOrganizationAsync(OrganizationDTO organizationDto)
+        public async Task<string> AddOrganizationAsync(OrganizationDTO organizationDto)
         {
-            // Validate the DTO before proceeding
+            
             var validationContext = new ValidationContext(organizationDto);
             var validationResults = new List<ValidationResult>();
 
@@ -64,13 +64,13 @@ namespace HRMS.POC.Project.Web.API.Repository
                 throw new ValidationException("Validation failed: " + string.Join(", ", validationResults.Select(v => v.ErrorMessage)));
             }
 
-            // Create a new organization instance
+           
             var organization = new Organization
             {
                 Id = Guid.NewGuid().ToString(),
                 orgName = organizationDto.orgName,
                 address = organizationDto.address,
-                // Map other properties as necessary
+                
             };
 
             var sql = @"INSERT INTO Organizations(Id, orgName, address) VALUES(@Id, @orgName, @address)";
@@ -78,13 +78,12 @@ namespace HRMS.POC.Project.Web.API.Repository
             using (var connection = CreateConnection())
             {
                 var rowsAffected = await connection.ExecuteAsync(sql, organization);
-
                 if (rowsAffected == 0)
                 {
-                    throw new Exception("Object was not updated.");
+                    throw new Exception("Organization could not be created.");
                 }
 
-                return organizationDto; 
+                return organization.Id;
             }
         }
 
@@ -153,21 +152,21 @@ namespace HRMS.POC.Project.Web.API.Repository
                 var parameters = new
                 {
                     OrganizationId = organizationId,
-                    UserId = user.Id // Ensure user.Id exists
+                    UserId = user.Id
                 };
 
                 var affectedRows = await connection.ExecuteAsync(sql, parameters);
-                return affectedRows > 0; // Return true if a row was inserted
+                return affectedRows > 0;
             }
         }
 
-        public async Task<Organization> FindOrganizationAsync()
+        public async Task<Organization> FindOrganizationAsync(string orgId)
         {
-            var sql = "SELECT TOP 1 * FROM Organizations"; 
+            var sql = "SELECT * FROM Organizations WHERE Id = @Id"; 
 
             using (var connection = CreateConnection())
             {
-                return await connection.QueryFirstOrDefaultAsync<Organization>(sql);
+                return await connection.QueryFirstOrDefaultAsync<Organization>(sql, new {Id = orgId});
             }
         }
 

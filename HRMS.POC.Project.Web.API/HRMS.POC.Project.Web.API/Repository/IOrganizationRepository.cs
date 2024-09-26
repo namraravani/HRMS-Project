@@ -9,7 +9,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         Task<Organization> GetOrganizationByIdAsync(Guid id);
 
-        public Task<OrganizationDTO> AddOrganizationAsync(OrganizationDTO organizationDto);
+        public Task<string> AddOrganizationAsync(OrganizationDTO organizationDto);
 
         public Task<Organization> UpdateOrganizationAsync(Organization organization);
 
@@ -19,7 +19,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public Task<bool> AddUserToOrganization(string organizationId, ApplicationUser user);
 
-        Task<Organization> FindOrganizationAsync();
+        Task<Organization> FindOrganizationAsync(string orgId);
 
         Task<string> GetOrganizationIdByUserIdAsync(string userId);
 

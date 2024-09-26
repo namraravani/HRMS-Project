@@ -6,13 +6,13 @@ namespace HRMS.POC.Project.Web.API.Services
 {
     public interface IOrganizationService
     {
-        public Task<(bool Success, string Message)> AddOrgUserAsync(ApplicationUser user);
+        public Task<(bool Success, string Message)> AddOrgUserAsync(ApplicationUser user,string orgId);
 
         public Task<string> GetOrganizationIdByUserIdAsync(string userId);
 
         public Task<IEnumerable<Organization>> GetOrganizationAsync(string userId,string role);
 
-        public Task<OrganizationDTO> CreateOrganization(OrganizationDTO organization, UserDTO user, string createdUserId);
+        public Task<string> CreateOrganization(OrganizationDTO organization, UserDTO user, string createdUserId);
 
         public Task<Organization> UpdateOrganizationAsync(OrganizationDTO organizationDto);
 

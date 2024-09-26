@@ -21,44 +21,50 @@ namespace HRMS.POC.Project.Web.API.Services
             
         }
 
-        public async Task<OrganizationDTO> CreateOrganization(OrganizationDTO organization, UserDTO user, string createdUserId)
+        public async Task<string> CreateOrganization(OrganizationDTO organizationDto, UserDTO userDto, string createdUserId)
         {
-            var result1 = await _organizationRepository.AddOrganizationAsync(organization);
-            if (result1 == null)
+            // Step 1: Add the organization
+            var organizationId = await _organizationRepository.AddOrganizationAsync(organizationDto);
+            if (string.IsNullOrEmpty(organizationId))
             {
-                return null;
+                return null; // Return or handle the error
             }
 
-            // Create A Admin for that organization
-            var firstUser = new ApplicationUser
+            // Step 2: Create the user
+            var newUser = new ApplicationUser
             {
-                UserName = user.UserName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                firstName = user.FirstName,
-                lastName = user.LastName,
+                UserName = userDto.UserName,
+                Email = userDto.Email,
+                PhoneNumber = userDto.PhoneNumber,
+                firstName = userDto.FirstName,
+                lastName = userDto.LastName,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                Is_Delete = false
-
+                Is_Delete = false,
+                Created_by = createdUserId // Set created by before user creation
             };
 
-            var result = await _userManager.CreateAsync(firstUser, user.Password);
-            if (!result.Succeeded)
+            var createUserResult = await _userManager.CreateAsync(newUser, userDto.Password);
+            if (!createUserResult.Succeeded)
             {
+                // Log errors or handle them accordingly
                 return null;
             }
 
-            firstUser.Created_by = createdUserId;
-
-            if (!await _userManager.IsInRoleAsync(firstUser, "Admin"))
+            // Step 3: Assign role if not already assigned
+            if (!await _userManager.IsInRoleAsync(newUser, "Admin"))
             {
-                await _userManager.AddToRoleAsync(firstUser, "Admin");
+                await _userManager.AddToRoleAsync(newUser, "Admin");
             }
 
-            var orgUserResult = await AddOrgUserAsync(firstUser);
+            // Step 4: Add the user to the organization
+            var addOrgUserResult = await AddOrgUserAsync(newUser, organizationId);
+            if (!addOrgUserResult.Success)
+            {
+                // Handle failure to add user to organization
+                return null;
+            }
 
-            return result1;
-
+            return organizationId; // Return the ID of the newly created organization
         }
 
         public async Task<IEnumerable<Organization>> GetOrganizationAsync(string userId, string role) {
@@ -68,23 +74,18 @@ namespace HRMS.POC.Project.Web.API.Services
 
             return result;
         }
-        public async Task<(bool Success, string Message)> AddOrgUserAsync(ApplicationUser user)
+        public async Task<(bool Success, string Message)> AddOrgUserAsync(ApplicationUser user, string orgId)
         {
-            var orgExist = await _organizationRepository.FindOrganizationAsync();
+            var orgExist = await _organizationRepository.FindOrganizationAsync(orgId);
             if (orgExist == null)
             {
                 return (false, "Organization does not exist.");
             }
 
-            
+            // Ensure that the user is linked to the organization correctly
             var result = await _organizationRepository.AddUserToOrganization(orgExist.Id, user);
 
-            if (result)
-            {
-                return (true, "User added to organization successfully.");
-            }
-
-            return (false, "Failed to add user to organization.");
+            return result ? (true, "User added to organization successfully.") : (false, "Failed to add user to organization.");
         }
 
         public async Task<string> GetOrganizationIdByUserIdAsync(string userId)

@@ -61,11 +61,11 @@ public class UserService : IUserService
         newUser.Created_by = newUser.Id;
 
 
-        var orgUserResult = await _organizationService.AddOrgUserAsync(newUser);
-        if (!orgUserResult.Success)
-        {
-            return "Failed to add user to organization: " + orgUserResult.Message;
-        }
+        //var orgUserResult = await _organizationService.AddOrgUserAsync(newUser);
+        //if (!orgUserResult.Success)
+        //{
+        //    return "Failed to add user to organization: " + orgUserResult.Message;
+        //}
 
         await _userRepository.UpdateUserAsync(newUser);
 
@@ -138,7 +138,7 @@ public class UserService : IUserService
     {
         if (role == "Employee")
         {
-            return "Unaothorized"; 
+            return "Unauthorized"; 
         }
 
         var newUserId = await _userRepository.AddUserAsync(user, creatorUserId, organizationId, assignedRole);
@@ -150,6 +150,23 @@ public class UserService : IUserService
 
         return newUserId;
     }
+
+    public async Task<bool> CheckUserForUpdate(string userId, string accessorId)
+    {
+        var user = await _userRepository.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return false; 
+        }
+
+        
+        return user.Created_by == accessorId;
+    }
+
+
+
+    
+
 
 
 

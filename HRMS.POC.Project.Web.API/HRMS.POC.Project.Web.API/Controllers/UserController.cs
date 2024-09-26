@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HRMS.POC.Project.Web.API.Controllers
 {
@@ -57,6 +58,36 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin, HR")]
+        [HttpPost]
+        public async Task<IActionResult> updateUser(string userId)
+        {
+            string accessorId = UserId; 
+
+            
+           
+
+            if (UserRole == null)
+            {
+                return BadRequest("User is not authorized to update.");
+            }
+
+            
+            if (UserRole == "HR")
+            {
+                var canUpdate = await _userService.CheckUserForUpdate(userId, accessorId);
+                if (!canUpdate)
+                {
+                    return BadRequest("You are not authorized to update this user.");
+                }
+            }
+
+            await _userService.UpdateUser(userId);
+
+            return Ok("User is updated.");
+        }
+
+
 
 
         //[HttpPost]
@@ -103,34 +134,56 @@ namespace HRMS.POC.Project.Web.API.Controllers
         //    return BadRequest("Role does not exist.");
         //}
 
-        //// PUT: api/user/update/{id}
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userDto)
-        //{
-        //    if (userDto == null)
-        //    {
-        //        return BadRequest("Invalid user data.");
-        //    }
+        // PUT: api/user/update/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userDto)
+        {
+            if (userDto == null)
+            {
+                return BadRequest("Invalid user data.");
+            }
 
-        //    var existingUser = await _userRepository.GetUserByIdAsync(id);
-        //    if (existingUser == null)
-        //    {
-        //        return NotFound();
-        //    }
+            // Get the accessor ID and role from the current user context
+            var accessorId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Adjust as necessary
+            var userRole = User.FindFirstValue(ClaimTypes.Role); // Assuming you have this set up
 
-        //    // Only update the fields that are provided in the DTO
-        //    existingUser.UserName = userDto.UserName ?? existingUser.UserName;
-        //    existingUser.firstName = userDto.FirstName ?? existingUser.firstName;
-        //    existingUser.lastName = userDto.LastName ?? existingUser.lastName;
+            // Check if the user exists
+            var existingUser = await _userRepository.GetUserByIdAsync(id);
+            if (existingUser == null)
+            {
+                return NotFound();
+            }
 
-        //    var updatedUser = await _userRepository.UpdateUserAsync(existingUser);
-        //    if (updatedUser == null)
-        //    {
-        //        return NotFound();
-        //    }
+            // Check roles
+            if (userRole == "HR")
+            {
+                // Check if HR is authorized based on created_by ID
+                if (existingUser.CreatedBy != accessorId)
+                {
+                    return Forbid(); // 403 Forbidden if HR is not authorized
+                }
+            }
+            else if (userRole != "Admin")
+            {
+                return Forbid(); // Only Admin can perform updates if not HR
+            }
 
-        //    return Ok(updatedUser);
-        //}
+            // Update user properties
+            existingUser.UserName = userDto.UserName ?? existingUser.UserName;
+            existingUser.firstName = userDto.FirstName ?? existingUser.firstName;
+            existingUser.lastName = userDto.LastName ?? existingUser.lastName;
+
+            // Call the service to update the user
+            var updateSuccess = await _userService.UpdateUser(existingUser);
+            if (!updateSuccess)
+            {
+                return StatusCode(500, "Failed to update user.");
+            }
+
+            return Ok("User updated successfully.");
+        }
+
+
 
 
 
