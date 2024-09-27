@@ -15,7 +15,7 @@ using User.Management.API.Models.Login;
 namespace HRMS.POC.Project.Web.API.Controllers
 {
     [ApiController]
-    [Route("api/Register")]
+    [Route("api/[Controller]")]
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;

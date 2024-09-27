@@ -16,7 +16,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
     
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
 
     public class OrganizationController : BaseController
     {
@@ -29,7 +29,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
             _organizationService = organizationService;
         }
 
-        [Authorize(Policy = "GetOrganizationPolicy")]
+        //[Authorize(Policy = "GetOrganizationPolicy")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Organization>>> GetOrganizations()
         {

@@ -17,7 +17,7 @@ public class DataSeeder
 
     public async Task SeedAsync()
     {
-        // Ensure roles are created
+        
         var roles = new[] { "Admin", "HR", "Employee", "SuperAdmin" };
         foreach (var role in roles)
         {
@@ -27,12 +27,12 @@ public class DataSeeder
                 if (!roleResult.Succeeded)
                 {
                     Console.WriteLine($"Failed to create role: {role}. Errors: {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
-                    return; // Exit if any role fails to create
+                    return; 
                 }
             }
         }
 
-        // Check if the SuperAdmin user already exists
+        
         var superAdminEmail = "namraravani8@gmail.com";
         var superAdminUser = await _userManager.FindByEmailAsync(superAdminEmail);
         if (superAdminUser == null)
@@ -52,7 +52,7 @@ public class DataSeeder
             var result = await _userManager.CreateAsync(user, "Namra@123");
             if (result.Succeeded)
             {
-                // Assign role to the user
+                
                 var roleResult = await _userManager.AddToRoleAsync(user, "SuperAdmin");
                 if (!roleResult.Succeeded)
                 {
@@ -60,7 +60,7 @@ public class DataSeeder
                     return;
                 }
 
-                // Seed organization
+               
                 var organization = new Organization
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -71,7 +71,7 @@ public class DataSeeder
                 await _dbContext.Organizations.AddAsync(organization);
                 await _dbContext.SaveChangesAsync();
 
-                // Seed OrganizationUser
+                
                 var organizationUser = new OrganizationUser
                 {
                     OrganizationId = organization.Id,
