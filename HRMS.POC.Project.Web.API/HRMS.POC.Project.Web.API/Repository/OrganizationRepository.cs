@@ -203,6 +203,30 @@ namespace HRMS.POC.Project.Web.API.Repository
             }
         }
 
+        public async Task<OrganizationDTO> GetOrganizationByIdAsync(string id)
+        {
+            var sql = "SELECT * FROM Organizations WHERE Id = @Id";
+
+            using (var connection = CreateConnection())
+            {
+                var organization = await connection.QueryFirstOrDefaultAsync<Organization>(sql, new { Id = id });
+
+                if (organization == null)
+                {
+                    throw new Exception($"Organization with ID '{id}' not found.");
+                }
+
+                
+                return new OrganizationDTO
+                {
+                    Id = organization.Id,
+                    orgName = organization.orgName,
+                    address = organization.address
+                };
+            }
+        }
+
+
 
 
 

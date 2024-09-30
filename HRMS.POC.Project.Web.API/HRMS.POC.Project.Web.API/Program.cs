@@ -13,6 +13,16 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder => builder
+            .WithOrigins("https://localhost:7066")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
+});
+
 // Configure database settings
 builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("DatabaseConfig"));
 builder.Services.AddDbContext<HrmsDbContext>(options =>
@@ -160,7 +170,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 

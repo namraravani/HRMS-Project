@@ -17,5 +17,8 @@ namespace HRMS.POC.Project.Web.API.Services
         public Task<Organization> UpdateOrganizationAsync(OrganizationDTO organizationDto);
 
         public Task<bool> DeleteOrganizationAsync(string id);
+
+        public Task<OrganizationDTO> GetOrganizationByIdAsync(string id);
     }
+
 }

@@ -27,13 +27,26 @@ namespace HRMS_POC_Project_Frontend.Controllers
                 var token = await _userService.LoginAsync(loginDto);
                 if (!string.IsNullOrEmpty(token))
                 {
-                    HttpContext.Response.Cookies.Append("AuthToken", token);
-                    return RedirectToAction("Index", "Organization"); 
+                    Console.WriteLine("Hello I am Here I am About to send the token ");
+                    Console.WriteLine(token);
+                    HttpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Path = "/"
+                    });
+
+                   
+                    
+
+                    return RedirectToAction("Index", "Organization");
                 }
 
                 ModelState.AddModelError("", "Invalid login attempt.");
             }
             return View("Login", loginDto);
         }
+
     }
 }

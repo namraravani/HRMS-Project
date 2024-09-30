@@ -25,6 +25,8 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public Task<IEnumerable<string>> FetchUsersFromOrganizationIdAsync(string organizationId);
 
+        Task<OrganizationDTO> GetOrganizationByIdAsync(string id);
+
 
 
 

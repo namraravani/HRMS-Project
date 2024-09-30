@@ -16,7 +16,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
     
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
 
     public class OrganizationController : BaseController
     {
@@ -29,21 +29,21 @@ namespace HRMS.POC.Project.Web.API.Controllers
             _organizationService = organizationService;
         }
 
-        //[Authorize(Policy = "GetOrganizationPolicy")]
+        [Authorize(Policy = "GetOrganizationPolicy")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Organization>>> GetOrganizations()
         {
-            
+            LogTokenClaims();
+
             var userId = UserId;
             var userRole = UserRole;
-            
 
             var result = await _organizationService.GetOrganizationAsync(userId,userRole);
             return Ok(result);
         }
 
 
-        
+
 
 
         [Authorize(Policy = "CreateOrganizationPolicy")]
@@ -95,7 +95,21 @@ namespace HRMS.POC.Project.Web.API.Controllers
             return NoContent(); 
         }
 
-        
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetOrganizationById(string id)
+        {
+            var organization = await _organizationService.GetOrganizationByIdAsync(id);
+
+            if (organization == null)
+            {
+                return NotFound("Organization not found.");
+            }
+
+            return Ok(organization);
+        }
+
+
+
 
     }
 }

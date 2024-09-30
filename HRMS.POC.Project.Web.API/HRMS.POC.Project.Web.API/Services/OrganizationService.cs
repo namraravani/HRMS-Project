@@ -127,6 +127,11 @@ namespace HRMS.POC.Project.Web.API.Services
             return allDeleted; 
         }
 
+        public async Task<OrganizationDTO> GetOrganizationByIdAsync(string id)
+        {
+            return await _organizationRepository.GetOrganizationByIdAsync(id);
+        }
+
 
 
 

@@ -8,6 +8,6 @@ namespace HRMS_POC_Project_Frontend.Services
 
         Task<string> LoginAsync(LoginDTO loginDto);
 
-        Task<string> GetProtectedDataAsync(HttpClient client);
+        public Task<string> GetProtectedDataAsync(HttpClient client);
     }
 }

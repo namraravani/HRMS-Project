@@ -2,22 +2,24 @@ using HRMS_POC_Project_Frontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+
+builder.Services.AddControllersWithViews(); 
+
+
 builder.Services.AddHttpClient<IUserService, UserService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7124/"); // Your API base URL
+    client.BaseAddress = new Uri("https://localhost:7124/");
 });
 builder.Services.AddHttpClient<IOrganizationService, OrganizationService>(client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7124/"); // Your API base URL
+    client.BaseAddress = new Uri("https://localhost:7124/");
 });
 
-// ... other service registrations
 
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -33,10 +35,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization(); 
+
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Auth}/{action=Index}/{id?}"); 
+    pattern: "{controller=Auth}/{action=Index}/{id?}");
 
 app.Run();

@@ -19,5 +19,22 @@ public abstract class BaseController : ControllerBase
             throw new UnauthorizedAccessException("User is not authenticated.");
         }
     }
+
+    protected IActionResult LogTokenClaims()
+    {
+        if (User.Identity.IsAuthenticated)
+        {
+            Console.WriteLine($"User ID: {UserId}");
+            Console.WriteLine($"User Name: {UserName}");
+            Console.WriteLine($"User Role: {UserRole}");
+            Console.WriteLine($"Organization ID: {OrganizationId}");
+        }
+        else
+        {
+            Console.WriteLine("User is not authenticated.");
+        }
+
+        return Ok();
+    }
 }
 
