@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using HRMS.POC.Project.Web.API.DTO;
 using HRMS.POC.Project.Web.API.Models;
-using HRMS.POC.Project.Web.API.Models.DTO;
 using HRMS_POC_Project.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;

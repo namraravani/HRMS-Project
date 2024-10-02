@@ -10,7 +10,7 @@ namespace HRMS_POC_Project_Frontend.Services
         {
             _httpClient = httpClient;
 
-            // Retrieve token from cookies
+            
             var token = httpContextAccessor.HttpContext?.Request.Cookies["AuthToken"];
             if (!string.IsNullOrEmpty(token))
             {
@@ -18,7 +18,7 @@ namespace HRMS_POC_Project_Frontend.Services
             }
         }
 
-        // Example method
+        
         public async Task<string> GetProtectedDataAsync()
         {
             var response = await _httpClient.GetAsync("api/protected-data");

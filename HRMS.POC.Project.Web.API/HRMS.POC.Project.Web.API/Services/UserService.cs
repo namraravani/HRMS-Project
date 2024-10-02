@@ -1,9 +1,11 @@
-﻿using HRMS.POC.Project.Web.API.Models.DTO;
+﻿using HRMS.POC.Project.Web.API.DTO;
+using HRMS.POC.Project.Web.API.Models.Configuration;
 using HRMS.POC.Project.Web.API.Models.Register;
 using HRMS.POC.Project.Web.API.Repository;
 using HRMS.POC.Project.Web.API.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,11 +23,11 @@ public class UserService : IUserService
     private readonly IConfiguration _configuration;
     private readonly IOrganizationService _organizationService;
 
-    public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager,string jwtSecret, IOrganizationService organizationService, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
+    public UserService(IUserRepository userRepository, UserManager<ApplicationUser> userManager, IOptions<JwtSettings> jwtSettings, IOrganizationService organizationService, IConfiguration configuration, RoleManager<IdentityRole> roleManager)
     {
         _userRepository = userRepository;
         _userManager = userManager;
-        _jwtSecret = jwtSecret;
+        _jwtSecret = jwtSettings.Value.Secret;
         _roleManager = roleManager;
         _organizationService = organizationService;
         _configuration = configuration;
@@ -61,11 +63,7 @@ public class UserService : IUserService
         newUser.Created_by = newUser.Id;
 
 
-        //var orgUserResult = await _organizationService.AddOrgUserAsync(newUser);
-        //if (!orgUserResult.Success)
-        //{
-        //    return "Failed to add user to organization: " + orgUserResult.Message;
-        //}
+        
 
         await _userRepository.UpdateUserAsync(newUser);
 
@@ -74,36 +72,22 @@ public class UserService : IUserService
     public async Task<string> Login(LoginUser userDto)
     {
         var user = await _userManager.FindByNameAsync(userDto.Username);
-        if (user == null)
-        {
-            
-            Console.WriteLine($"User not found: {userDto.Username}");
-            return null;
-        }
+        
 
         var passwordCheck = await _userManager.CheckPasswordAsync(user, userDto.Password);
-        if (!passwordCheck)
-        {
-            
-            Console.WriteLine("Password check failed for user: " + userDto.Username);
-            return null;
-        }
+        
 
         var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-        if (role == null)
-        {
-            
-            Console.WriteLine("No role found for user: " + userDto.Username);
-            return null;
-        }
+        
 
         var organizationId = await _organizationService.GetOrganizationIdByUserIdAsync(user.Id);
-        if (string.IsNullOrEmpty(organizationId))
+        
+
+        if (user == null || passwordCheck == null || role == null || organizationId == null)
         {
-            
-            Console.WriteLine("No organization ID found for user: " + userDto.Username);
-            return null; 
+            return "User can't login successfully";
         }
+
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSecret);

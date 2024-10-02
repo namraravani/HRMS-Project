@@ -1,5 +1,5 @@
-﻿using HRMS.POC.Project.Web.API.Models.Configuration;
-using HRMS.POC.Project.Web.API.Models.DTO;
+﻿using HRMS.POC.Project.Web.API.DTO;
+
 using HRMS.POC.Project.Web.API.Models.Register;
 using HRMS.POC.Project.Web.API.Repository;
 using HRMS.POC.Project.Web.API.Services;

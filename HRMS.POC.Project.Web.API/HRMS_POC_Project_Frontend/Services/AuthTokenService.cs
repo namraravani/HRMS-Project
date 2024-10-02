@@ -15,7 +15,7 @@ namespace HRMS_POC_Project_Frontend.Services
 
         public string GetAuthToken()
         {
-            // Retrieve the token from cookies
+            
             var tokenJson = _httpContextAccessor.HttpContext?.Request.Cookies["AuthToken"];
 
             if (!string.IsNullOrEmpty(tokenJson))

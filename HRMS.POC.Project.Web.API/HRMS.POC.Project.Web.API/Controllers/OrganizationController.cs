@@ -6,14 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HRMS.POC.Project.Web.API.Repository;
-using HRMS.POC.Project.Web.API.Models.DTO;
 using Microsoft.AspNetCore.Authorization;
 using HRMS.POC.Project.Web.API.Services;
+using HRMS.POC.Project.Web.API.Data;
+using HRMS.POC.Project.Web.API.DTO;
 
 namespace HRMS.POC.Project.Web.API.Controllers
 {
 
-    
+
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]

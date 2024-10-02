@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace HRMS.POC.Project.Web.API.Models.DTO
+namespace HRMS.POC.Project.Web.API.DTO
 {
     public class OrganizationDTO
     {
@@ -12,6 +12,6 @@ namespace HRMS.POC.Project.Web.API.Models.DTO
 
         [Required(ErrorMessage = "Organization Address is Required")]
         public string? address { get; set; }
-        
+
     }
 }

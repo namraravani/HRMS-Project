@@ -1,4 +1,4 @@
-﻿namespace HRMS.POC.Project.Web.API.Models.DTO
+﻿namespace HRMS.POC.Project.Web.API.DTO
 {
     public class UserDTO
     {
@@ -7,6 +7,6 @@
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; } 
+        public string Password { get; set; }
     }
 }

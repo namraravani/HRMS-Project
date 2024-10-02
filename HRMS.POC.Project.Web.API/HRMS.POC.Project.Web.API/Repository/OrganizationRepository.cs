@@ -1,6 +1,6 @@
 ﻿using Dapper;
+using HRMS.POC.Project.Web.API.DTO;
 using HRMS.POC.Project.Web.API.Models;
-using HRMS.POC.Project.Web.API.Models.DTO;
 using HRMS_POC_Project.Model;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
@@ -25,12 +25,12 @@ namespace HRMS.POC.Project.Web.API.Repository
         }
 
 
-        public async Task<IEnumerable<Organization>> GetUserOrganizationsAsync(string userId,string role)
+        public async Task<IEnumerable<Organization>> GetUserOrganizationsAsync(string userId, string role)
         {
-            var sql = "GetUserOrganizations"; 
+            var sql = "GetUserOrganizations";
             using (var connection = CreateConnection())
             {
-                return await connection.QueryAsync<Organization>(sql, new { UserId = userId,Role = role}, commandType: CommandType.StoredProcedure);
+                return await connection.QueryAsync<Organization>(sql, new { UserId = userId, Role = role }, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -55,22 +55,13 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public async Task<string> AddOrganizationAsync(OrganizationDTO organizationDto)
         {
-            
-            var validationContext = new ValidationContext(organizationDto);
-            var validationResults = new List<ValidationResult>();
 
-            if (!Validator.TryValidateObject(organizationDto, validationContext, validationResults, true))
-            {
-                throw new ValidationException("Validation failed: " + string.Join(", ", validationResults.Select(v => v.ErrorMessage)));
-            }
-
-           
             var organization = new Organization
             {
                 Id = Guid.NewGuid().ToString(),
                 orgName = organizationDto.orgName,
                 address = organizationDto.address,
-                
+
             };
 
             var sql = @"INSERT INTO Organizations(Id, orgName, address) VALUES(@Id, @orgName, @address)";
@@ -113,7 +104,7 @@ namespace HRMS.POC.Project.Web.API.Repository
 
             using (var connection = CreateConnection())
             {
-                await connection.ExecuteAsync(sql,organization);
+                await connection.ExecuteAsync(sql, organization);
 
                 if (organization == null)
                 {
@@ -122,25 +113,25 @@ namespace HRMS.POC.Project.Web.API.Repository
 
                 return organization;
             }
-            
+
         }
 
         public async Task<string> GetOrganizationByName(string name)
         {
             var sql = "SELECT Id FROM Organizations WHERE orgName = @name";
 
-            using(var connection = CreateConnection())
+            using (var connection = CreateConnection())
             {
                 var id = await connection.QueryFirstOrDefaultAsync(sql, name);
 
-                if(id == null)
+                if (id == null)
                 {
                     throw new Exception("No Organization Found");
                 }
 
                 return id;
             }
-  
+
         }
 
         public async Task<bool> AddUserToOrganization(string organizationId, ApplicationUser user)
@@ -162,11 +153,11 @@ namespace HRMS.POC.Project.Web.API.Repository
 
         public async Task<Organization> FindOrganizationAsync(string orgId)
         {
-            var sql = "SELECT * FROM Organizations WHERE Id = @Id"; 
+            var sql = "SELECT * FROM Organizations WHERE Id = @Id";
 
             using (var connection = CreateConnection())
             {
-                return await connection.QueryFirstOrDefaultAsync<Organization>(sql, new {Id = orgId});
+                return await connection.QueryFirstOrDefaultAsync<Organization>(sql, new { Id = orgId });
             }
         }
 
@@ -178,7 +169,7 @@ namespace HRMS.POC.Project.Web.API.Repository
             {
                 return await conn.ExecuteScalarAsync<string>(sql, new { UserId = userId });
             }
-           
+
         }
 
         public async Task<bool> DeleteOrganizationAsync(string id)
@@ -188,18 +179,18 @@ namespace HRMS.POC.Project.Web.API.Repository
             using (var connection = CreateConnection())
             {
                 var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id });
-                return rowsAffected > 0; 
+                return rowsAffected > 0;
             }
-            
+
         }
         public async Task<IEnumerable<string>> FetchUsersFromOrganizationIdAsync(string organizationId)
         {
             var sql = "SELECT UserId FROM OrganizationUsers WHERE OrganizationId = @Id;";
 
             using (var connection = CreateConnection())
-            {  
+            {
                 var userIds = await connection.QueryAsync<string>(sql, new { Id = organizationId });
-                return userIds; 
+                return userIds;
             }
         }
 
@@ -216,7 +207,7 @@ namespace HRMS.POC.Project.Web.API.Repository
                     throw new Exception($"Organization with ID '{id}' not found.");
                 }
 
-                
+
                 return new OrganizationDTO
                 {
                     Id = organization.Id,

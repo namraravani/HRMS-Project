@@ -1,5 +1,5 @@
-﻿using HRMS.POC.Project.Web.API.Models;
-using HRMS.POC.Project.Web.API.Models.DTO;
+﻿using HRMS.POC.Project.Web.API.DTO;
+using HRMS.POC.Project.Web.API.Models;
 using HRMS.POC.Project.Web.API.Models.Register;
 using HRMS.POC.Project.Web.API.Repository;
 using Microsoft.AspNetCore.Identity;
@@ -114,7 +114,7 @@ namespace HRMS.POC.Project.Web.API.Services
             var userIds = await _organizationRepository.FetchUsersFromOrganizationIdAsync(id);
             bool allDeleted = true;
 
-            // Loop through each userId and attempt to delete
+           
             foreach (var userId in userIds)
             {
                 var userDeleted = await _userRepository.DeleteUserForOrganizationAsync(userId);

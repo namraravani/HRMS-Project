@@ -1,4 +1,4 @@
-﻿using HRMS.POC.Project.Web.API.Models.DTO;
+﻿using HRMS.POC.Project.Web.API.DTO;
 
 public class CreateOrganizationRequest
 {

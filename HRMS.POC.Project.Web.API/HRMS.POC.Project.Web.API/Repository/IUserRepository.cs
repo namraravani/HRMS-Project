@@ -1,5 +1,5 @@
-﻿using HRMS.POC.Project.Web.API.Models;
-using HRMS.POC.Project.Web.API.Models.DTO;
+﻿using HRMS.POC.Project.Web.API.DTO;
+using HRMS.POC.Project.Web.API.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace HRMS.POC.Project.Web.API.Repository
@@ -7,22 +7,22 @@ namespace HRMS.POC.Project.Web.API.Repository
     public interface IUserRepository
     {
         
-        public Task<IEnumerable<ApplicationUser>> GetUsersAsync();
+        Task<IEnumerable<ApplicationUser>> GetUsersAsync();
 
-        public Task<ApplicationUser> GetUserByIdAsync(string id);
+        Task<ApplicationUser> GetUserByIdAsync(string id);
 
-        public Task<bool> UpdateUserAsync(ApplicationUser user);
+        Task<bool> UpdateUserAsync(ApplicationUser user);
 
-        public Task<ApplicationUser> DeleteUserAsync(ApplicationUser user);
+        Task<ApplicationUser> DeleteUserAsync(ApplicationUser user);
 
-        public Task<ApplicationUser> GetUserByUsername(string username);
+        Task<ApplicationUser> GetUserByUsername(string username);
 
-        public Task<string> AddUser(ApplicationUser user, string password, UserManager<ApplicationUser> userManager);
+        Task<string> AddUser(ApplicationUser user, string password, UserManager<ApplicationUser> userManager);
 
-        public Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId);
+        Task<IEnumerable<UserDTO>> GetUsersByOrganizationIdAsync(string organizationId);
 
-        public Task<bool> DeleteUserForOrganizationAsync(string userId);
+        Task<bool> DeleteUserForOrganizationAsync(string userId);
 
-        public Task<string> AddUserAsync(UserDTO userDto, string creatorUserId, string organizationId, string assignedRole);
+        Task<string> AddUserAsync(UserDTO userDto, string creatorUserId, string organizationId, string assignedRole);
     }
 }

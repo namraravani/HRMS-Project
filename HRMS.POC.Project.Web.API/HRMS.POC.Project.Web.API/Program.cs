@@ -1,5 +1,6 @@
 using HRMS.POC.Project.Web.API.Controllers;
-using HRMS.POC.Project.Web.API.Models;
+using HRMS.POC.Project.Web.API.Data;
+using HRMS.POC.Project.Web.API.Models.Configuration;
 using HRMS.POC.Project.Web.API.Repository;
 using HRMS.POC.Project.Web.API.Services;
 using HRMS_POC_Project.Model;
@@ -25,6 +26,8 @@ builder.Services.AddCors(options =>
 
 // Configure database settings
 builder.Services.Configure<DatabaseConfig>(builder.Configuration.GetSection("DatabaseConfig"));
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT"));
+
 builder.Services.AddDbContext<HrmsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -38,19 +41,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 
 // Register services
-builder.Services.AddScoped<IOrganizationService, OrganizationService>(); 
-builder.Services.AddScoped<IUserService, UserService>(
-    provider =>
-{
-    var userRepository = provider.GetRequiredService<IUserRepository>();
-    var userManager = provider.GetRequiredService<UserManager<ApplicationUser>>();
-    var jwtSecret = builder.Configuration["JWT:Secret"];
-    var organizationService = provider.GetRequiredService<IOrganizationService>();
-    var configuration = provider.GetRequiredService<IConfiguration>();
-    var roleManager = provider.GetRequiredService<RoleManager<IdentityRole>>();
-    return new UserService(userRepository, userManager, jwtSecret, organizationService, configuration, roleManager);
-}
-);
+builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Configure JWT authentication
 builder.Services.AddAuthentication(options =>
@@ -69,13 +61,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("UpdatePolicy", policy =>
-        policy.RequireRole("Admin"));
-});
-
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<DataSeeder>();
@@ -112,7 +97,7 @@ builder.Services.AddSwaggerGen(option =>
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("GetOrganizationPolicy", policy =>
-        policy.RequireRole("Admin","HR","Employee","SuperAdmin"));
+        policy.RequireRole("Admin", "HR", "Employee", "SuperAdmin"));
     options.AddPolicy("CreateOrganizationPolicy", policy =>
         policy.RequireRole("SuperAdmin"));
     options.AddPolicy("UpdateOrganizationPolicy", policy =>
@@ -135,26 +120,21 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    try
-    {
-        var dbContext = services.GetRequiredService<HrmsDbContext>();
 
-        
-        await dbContext.Database.MigrateAsync();
+    var dbContext = services.GetRequiredService<HrmsDbContext>();
 
-        
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-        
-        var seeder = new DataSeeder(userManager, roleManager, dbContext);
-        await seeder.SeedAsync();
-    }
-    catch (Exception ex)
-    {
-        
-        Console.WriteLine($"Error during migration/seeding: {ex.Message}");
-    }
+    await dbContext.Database.MigrateAsync();
+
+
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+
+    var seeder = new DataSeeder(userManager, roleManager, dbContext);
+    await seeder.SeedAsync();
+
+
 }
 app.UseHttpsRedirection();
 
@@ -162,7 +142,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var dataSeeder = services.GetRequiredService<DataSeeder>();
-    await dataSeeder.SeedAsync(); 
+    await dataSeeder.SeedAsync();
 }
 
 if (app.Environment.IsDevelopment())

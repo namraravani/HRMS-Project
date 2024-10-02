@@ -1,4 +1,4 @@
-﻿using HRMS.POC.Project.Web.API.Models;
+﻿using HRMS.POC.Project.Web.API.Data;
 using HRMS.POC.Project.Web.API.Models.Register;
 using HRMS.POC.Project.Web.API.Services;
 using Microsoft.AspNetCore.Http;
@@ -20,17 +20,16 @@ namespace HRMS.POC.Project.Web.API.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly HrmsDbContext _dbContext;
+        
         private readonly IUserService _userService;
 
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, HrmsDbContext dbContext,IUserService userService)
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration,IUserService userService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
-            _dbContext = dbContext;
             _userService = userService;
             
         }
@@ -41,7 +40,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
             var result = await _userService.Register(userDto);
             if (result == "0")
             {
-                return BadRequest("hello there is an error");
+                return BadRequest("User not Registered Successfully");
             }
             if (result == null) return BadRequest("user already exists.");
             return Ok(userDto);
@@ -121,20 +120,7 @@ namespace HRMS.POC.Project.Web.API.Controllers
         //    return Unauthorized();
         //}
 
-        private JwtSecurityToken GetToken(List<Claim> authClaims)
-        {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddHours(1),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
-
-            return token;
-        }
+        
 
 
 

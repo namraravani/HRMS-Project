@@ -6,12 +6,12 @@ namespace HRMS_POC_Project_Frontend.Services
     {
         Task<List<OrganizationDTO>> GetOrganizationAsync();
 
-        public Task<OrganizationDTO> CreateOrganizationAsync(CreateOrganizationRequest request);
+        Task<OrganizationDTO> CreateOrganizationAsync(CreateOrganizationRequest request);
 
-        public Task<OrganizationDTO> UpdateOrganizationAsync(OrganizationDTO organizationDto);
+        Task<OrganizationDTO> UpdateOrganizationAsync(OrganizationDTO organizationDto);
 
-        public Task<bool> DeleteOrganizationAsync(string id);
+        Task<bool> DeleteOrganizationAsync(string id);
 
-        public Task<OrganizationDTO> GetOrganizationByIdAsync(string id);
+        Task<OrganizationDTO> GetOrganizationByIdAsync(string id);
     }
 }

@@ -1,4 +1,5 @@
-﻿using HRMS.POC.Project.Web.API.Models;
+﻿using HRMS.POC.Project.Web.API.Data;
+using HRMS.POC.Project.Web.API.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

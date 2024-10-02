@@ -2,6 +2,6 @@
 {
     public interface IAuthService
     {
-        public Task<string> GetProtectedDataAsync();
+        Task<string> GetProtectedDataAsync();
     }
 }

@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using HRMS.POC.Project.Web.API.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace HRMS.POC.Project.Web.API.Models
+namespace HRMS.POC.Project.Web.API.Data
 {
     public class HrmsDbContext : IdentityDbContext<ApplicationUser, IdentityRole, string>
     {
@@ -32,7 +33,7 @@ namespace HRMS.POC.Project.Web.API.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            
+
 
             builder.Entity<OrganizationUser>()
                 .HasKey(ou => new { ou.OrganizationId, ou.UserId });
@@ -48,6 +49,6 @@ namespace HRMS.POC.Project.Web.API.Models
                 .HasForeignKey(ou => ou.UserId);
         }
 
-        
+
     }
 }
