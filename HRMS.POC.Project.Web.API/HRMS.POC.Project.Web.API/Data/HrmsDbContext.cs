@@ -14,8 +14,6 @@ namespace HRMS.POC.Project.Web.API.Data
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationUser> OrganizationUsers { get; set; }
 
-
-
         public static byte[] GetHash(string inputString)
         {
             using (HashAlgorithm algorithm = SHA256.Create())
@@ -34,7 +32,53 @@ namespace HRMS.POC.Project.Web.API.Data
         {
             base.OnModelCreating(builder);
 
+            // Seed roles
+            builder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "HR", NormalizedName = "HR" },
+                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "Employee", NormalizedName = "EMPLOYEE" },
+                new IdentityRole { Id = Guid.NewGuid().ToString(), Name = "SuperAdmin", NormalizedName = "SUPERADMIN" }
+            );
 
+            // Seed a SuperAdmin user
+            var superAdminId = Guid.NewGuid().ToString();
+            var superAdminUser = new ApplicationUser
+            {
+                Id = superAdminId,
+                UserName = "namraravani",
+                NormalizedUserName = "NAMRARAVANI",
+                Email = "namraravani8@gmail.com",
+                NormalizedEmail = "NAMRARAVANI8@GMAIL.COM",
+                PhoneNumber = "9427662325",
+                firstName = "Namra",
+                lastName = "Ravani",
+                Created_by = superAdminId,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            builder.Entity<ApplicationUser>().HasData(superAdminUser);
+
+            // Seed the organization
+            var organizationId = Guid.NewGuid().ToString();
+            var organization = new Organization
+            {
+                Id = organizationId,
+                orgName = "Evision",
+                address = "Gandhinagar"
+            };
+
+            builder.Entity<Organization>().HasData(organization);
+
+            // Seed the OrganizationUser relationship
+            builder.Entity<OrganizationUser>().HasData(
+                new OrganizationUser
+                {
+                    OrganizationId = organizationId,
+                    UserId = superAdminId
+                }
+            );
+
+            // Configure the OrganizationUser entity
             builder.Entity<OrganizationUser>()
                 .HasKey(ou => new { ou.OrganizationId, ou.UserId });
 
@@ -48,7 +92,5 @@ namespace HRMS.POC.Project.Web.API.Data
                 .WithMany(u => u.OrganizationUsers)
                 .HasForeignKey(ou => ou.UserId);
         }
-
-
     }
 }

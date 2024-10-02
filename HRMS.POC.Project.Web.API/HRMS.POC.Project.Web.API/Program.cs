@@ -63,7 +63,6 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<DataSeeder>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
@@ -112,44 +111,26 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("Admin", "SuperAdmin", "HR"));
     options.AddPolicy("CreateUsersPolicy", policy =>
         policy.RequireRole("Admin", "SuperAdmin", "HR"));
-
 });
 
 var app = builder.Build();
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
-
     var dbContext = services.GetRequiredService<HrmsDbContext>();
 
-
     await dbContext.Database.MigrateAsync();
-
-
-    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
-
-    var seeder = new DataSeeder(userManager, roleManager, dbContext);
-    await seeder.SeedAsync();
-
-
 }
+
 app.UseHttpsRedirection();
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var dataSeeder = services.GetRequiredService<DataSeeder>();
-    await dataSeeder.SeedAsync();
-}
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
